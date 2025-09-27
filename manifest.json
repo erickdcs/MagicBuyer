@@ -8,7 +8,8 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://www.ea.com/*/ea-sports-fc/ultimate-team/web-app/*"],
+      "matches": ["https://www.ea.com/*"],
+      "include_globs": ["*ea-sports-fc/ultimate-team/web-app/*"],
       "js": ["contentScript.js"],
       "run_at": "document_idle"
     }
@@ -37,7 +38,7 @@
         "dist/magicbuyer.js",
         "external/discord.11.4.2.min.js"
       ],
-      "matches": ["https://www.ea.com/*/ea-sports-fc/ultimate-team/web-app/*"]
+      "matches": ["https://www.ea.com/*"]
     }
   ]
 }
