@@ -6,7 +6,7 @@
   "content_scripts": [
     {
       "matches": ["https://www.ea.com/*/ea-sports-fc/ultimate-team/web-app/*"],
-      "js": ["dist/magicbuyer.js"],
+      "js": ["contentScript.js"],
       "run_at": "document_idle"
     }
   ],
@@ -27,5 +27,11 @@
     "https://discordapp.com/*",
     "https://futbin.org/*",
     "https://exp.host/*"
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["dist/magicbuyer.js"],
+      "matches": ["https://www.ea.com/*/ea-sports-fc/ultimate-team/web-app/*"]
+    }
   ]
 }
