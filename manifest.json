@@ -33,7 +33,10 @@
   ],
   "web_accessible_resources": [
     {
-      "resources": ["dist/magicbuyer.js"],
+      "resources": [
+        "dist/magicbuyer.js",
+        "external/discord.11.4.2.min.js"
+      ],
       "matches": ["https://www.ea.com/*/ea-sports-fc/ultimate-team/web-app/*"]
     }
   ]

@@ -73,13 +73,39 @@
 
   window.addEventListener("message", handlePageRequest);
 
-  const script = document.createElement("script");
-  script.id = SCRIPT_ID;
-  script.src = chrome.runtime.getURL("dist/magicbuyer.js");
-  script.type = "text/javascript";
-  script.onload = () => {
-    script.remove();
+  const DISCORD_SCRIPT_ID = "magicbuyer-discord-sdk";
+
+  const injectPageScript = (scriptId, relativePath) => {
+    return new Promise((resolve, reject) => {
+      if (document.getElementById(scriptId)) {
+        resolve();
+        return;
+      }
+
+      const script = document.createElement("script");
+      script.id = scriptId;
+      script.src = chrome.runtime.getURL(relativePath);
+      script.type = "text/javascript";
+      script.onload = () => {
+        script.remove();
+        resolve();
+      };
+      script.onerror = () => {
+        script.remove();
+        reject(new Error(`Failed to load ${relativePath}`));
+      };
+
+      (document.head || document.documentElement).appendChild(script);
+    });
   };
 
-  (document.head || document.documentElement).appendChild(script);
+  injectPageScript(DISCORD_SCRIPT_ID, "external/discord.11.4.2.min.js")
+    .catch((error) => {
+      console.warn("MagicBuyer: unable to preload Discord SDK", error);
+    })
+    .finally(() => {
+      injectPageScript(SCRIPT_ID, "dist/magicbuyer.js").catch((error) => {
+        console.error("MagicBuyer: failed to inject bundle", error);
+      });
+    });
 })();
