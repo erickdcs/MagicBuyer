@@ -23,8 +23,13 @@ import { getValue, setValue } from "../../../services/repository";
 import { generateButton } from "../../../utils/uiUtils/generateButton";
 let playerInput;
 
+const isPlayerSearchAvailable = () =>
+  typeof UTPlayerSearchControl === "function";
+
 export const destoryPlayerInput = () => {
-  playerInput.destroy();
+  if (playerInput && typeof playerInput.destroy === "function") {
+    playerInput.destroy();
+  }
   playerInput = null;
 };
 
@@ -38,6 +43,19 @@ const updateAbSortBy = () => {
 $(document).on({ change: updateAbSortBy }, `#${idAbSortBy}`);
 
 const playerIgnoreList = function () {
+  if (!isPlayerSearchAvailable()) {
+    return $(
+      `<div class="price-filter buyer-settings-field">
+        <div class="info">
+          <span class="secondary label">
+            Players List :<br/>
+            <small>Player search is unavailable. Open the MagicBuyer tab in the web app first.</small>
+          </span>
+        </div>
+      </div>`
+    );
+  }
+
   playerInput = new UTPlayerSearchControl();
   const playerListId = `#${idAddIgnorePlayersList}`;
   const element = $(`
@@ -117,9 +135,11 @@ const playerIgnoreList = function () {
               </div>              
               `);
 
-  $(playerInput.__root).insertBefore(element.find(`#${idAddIgnorePlayers}`));
-  playerInput.init();
-  playerInput._playerNameInput.setPlaceholder("Search Players");
+  if (playerInput) {
+    $(playerInput.__root).insertBefore(element.find(`#${idAddIgnorePlayers}`));
+    playerInput.init();
+    playerInput._playerNameInput.setPlaceholder("Search Players");
+  }
   return element;
 };
 
