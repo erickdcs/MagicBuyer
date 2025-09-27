@@ -79,6 +79,7 @@ if (settingsToggle) {
   });
 }
 
+
 const setError = (message) => {
   if (!message) {
     errorContainer.textContent = "";
@@ -135,7 +136,6 @@ const renderChips = (container, items, active, selectedSet, options = {}) => {
   }
 
   const { type } = options;
-
   container.innerHTML = items
     .map((item) => {
       const index = typeof item.index === "number" ? item.index : undefined;
@@ -168,6 +168,7 @@ const renderChips = (container, items, active, selectedSet, options = {}) => {
 
 const updateSettingsSummary = async (suppressNote = false) => {
   if (!categoryContainer || !filtersContainer || !settingsVisible) {
+
     return;
   }
 
@@ -189,6 +190,7 @@ const updateSettingsSummary = async (suppressNote = false) => {
     renderChips(filtersContainer, filters, activeFilter, selectedFilters, {
       type: "filter",
     });
+
 
     if (settingsNote) {
       settingsNote.textContent = "";
@@ -274,3 +276,4 @@ const handleCategorySelection = async (event) => {
 if (categoryContainer) {
   categoryContainer.addEventListener("click", handleCategorySelection);
 }
+
