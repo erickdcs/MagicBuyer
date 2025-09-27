@@ -3,6 +3,7 @@ import { isMarketAlertApp } from "./app.constants";
 import { initOverrides } from "./function-overrides";
 import { cssOverride } from "./function-overrides/css-override";
 import { initListeners } from "./services/listeners";
+import { initPageCommandBridge } from "./services/pageCommandBridge";
 
 const initAutobuyer = function () {
   let isHomePageLoaded = false;
@@ -32,6 +33,7 @@ const initFunctionOverrides = function () {
     initOverrides();
     initAutobuyer();
     isMarketAlertApp && initListeners();
+    initPageCommandBridge();
   } else {
     setTimeout(initFunctionOverrides, 1000);
   }

@@ -6,6 +6,8 @@
 
   const BACKGROUND_FETCH_REQUEST = "MAGIC_BUYER_BACKGROUND_FETCH";
   const BACKGROUND_FETCH_RESPONSE = "MAGIC_BUYER_BACKGROUND_FETCH_RESPONSE";
+  const PAGE_COMMAND_REQUEST = "MAGIC_BUYER_PAGE_COMMAND";
+  const PAGE_COMMAND_RESPONSE = "MAGIC_BUYER_PAGE_COMMAND_RESPONSE";
 
   const forwardToBackground = (payload) => {
     return new Promise((resolve, reject) => {
@@ -72,6 +74,39 @@
   };
 
   window.addEventListener("message", handlePageRequest);
+
+  chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message?.type !== PAGE_COMMAND_REQUEST) {
+      return false;
+    }
+
+    const requestId = message.id || `${Date.now()}-${Math.random()}`;
+
+    const handleResponse = (event) => {
+      if (event.source !== window || !event.data) {
+        return;
+      }
+      const { type, id, success, payload, error } = event.data;
+      if (type !== PAGE_COMMAND_RESPONSE || id !== requestId) {
+        return;
+      }
+      window.removeEventListener("message", handleResponse);
+      sendResponse({ success, payload, error });
+    };
+
+    window.addEventListener("message", handleResponse);
+
+    window.postMessage(
+      {
+        type: PAGE_COMMAND_REQUEST,
+        id: requestId,
+        payload: message.payload,
+      },
+      "*"
+    );
+
+    return true;
+  });
 
   const DISCORD_SCRIPT_ID = "magicbuyer-discord-sdk";
 
