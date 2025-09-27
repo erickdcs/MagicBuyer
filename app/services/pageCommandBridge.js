@@ -22,6 +22,8 @@ import {
 } from "../elementIds.constants";
 import { getSettingsCategories } from "../views/layouts/MenuItemView";
 import { getSavedFilterNames } from "../views/layouts/Settings/FilterSettingsView";
+} from "../elementIds.constants";
+
 
 const PAGE_COMMAND_REQUEST = "MAGIC_BUYER_PAGE_COMMAND";
 const PAGE_COMMAND_RESPONSE = "MAGIC_BUYER_PAGE_COMMAND_RESPONSE";

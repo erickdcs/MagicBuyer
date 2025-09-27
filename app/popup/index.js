@@ -52,6 +52,7 @@ const categoryContainer = document.getElementById("settings-categories");
 const filtersContainer = document.getElementById("settings-filters");
 const settingsNote = document.getElementById("settings-note");
 
+
 const setError = (message) => {
   if (!message) {
     errorContainer.textContent = "";
@@ -174,6 +175,7 @@ const withAction = (fn) => async () => {
     await updateStatus();
     await updateLogs();
     await updateSettingsSummary(true);
+
   } catch (error) {
     setError(error?.message || "Action failed");
   }
