@@ -2,10 +2,13 @@ const path = require("path");
 const TerserPlugin = require("terser-webpack-plugin");
 
 module.exports = {
-  entry: "./app/index.js",
+  entry: {
+    magicbuyer: "./app/index.js",
+    popup: "./app/popup/index.js",
+  },
   output: {
     path: path.resolve(__dirname, "dist"),
-    filename: "magicbuyer.js",
+    filename: "[name].js",
   },
   devServer: {
     contentBase: path.resolve(__dirname, "dist"),

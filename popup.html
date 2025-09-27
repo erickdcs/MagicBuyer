@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>MagicBuyer Control</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 16px;
+        min-width: 320px;
+        background: #0c1a2b;
+        color: #f2f2f2;
+      }
+      h1 {
+        font-size: 18px;
+        margin: 0 0 12px;
+        text-align: center;
+      }
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        justify-content: center;
+        margin-bottom: 12px;
+      }
+      .settings-strip {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px 10px;
+        align-items: center;
+        margin-bottom: 12px;
+        background: rgba(255, 255, 255, 0.06);
+        padding: 8px 10px;
+        border-radius: 6px;
+      }
+      .settings-strip[hidden] {
+        display: none;
+      }
+      .chip-label {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #74b9ff;
+      }
+      .chip-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+      .chip {
+        background: rgba(255, 255, 255, 0.1);
+        border: none;
+        border-radius: 16px;
+        padding: 4px 10px;
+        font-size: 12px;
+        white-space: nowrap;
+        line-height: 1;
+        color: #f2f2f2;
+        cursor: pointer;
+        transition: background 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .chip.active {
+        background: #1f8eed;
+        color: #fff;
+      }
+      .chip.selected {
+        border: 1px solid #1f8eed;
+      }
+      .chip.empty {
+        opacity: 0.6;
+        cursor: default;
+      }
+      .chip:focus-visible {
+        outline: 2px solid #1f8eed;
+        outline-offset: 2px;
+      }
+      .chip[disabled] {
+        opacity: 0.5;
+        cursor: progress;
+      }
+      button {
+        background: #1f8eed;
+        border: none;
+        border-radius: 4px;
+        color: #fff;
+        cursor: pointer;
+        padding: 6px 12px;
+        font-size: 14px;
+      }
+      button.secondary {
+        background: #2d3436;
+      }
+      button.danger {
+        background: #e74c3c;
+      }
+      button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+      .status {
+        font-size: 13px;
+        line-height: 1.4;
+        margin-bottom: 12px;
+        background: rgba(255, 255, 255, 0.06);
+        padding: 8px;
+        border-radius: 4px;
+      }
+      .status strong {
+        display: inline-block;
+        min-width: 120px;
+      }
+      .logs {
+        max-height: 240px;
+        overflow-y: auto;
+        background: rgba(0, 0, 0, 0.4);
+        border-radius: 4px;
+        padding: 8px;
+      }
+      .logs ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+      .error {
+        color: #ff7675;
+        margin-bottom: 8px;
+      }
+      .hint {
+        font-size: 12px;
+        color: #b2bec3;
+        margin-top: 8px;
+        text-align: center;
+      }
+      .hint.secondary {
+        margin-top: 0;
+        margin-bottom: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>MagicBuyer Control</h1>
+    <div class="settings-strip" hidden>
+      <span class="chip-label">Settings</span>
+      <div class="chip-group" id="settings-categories"></div>
+      <span class="chip-label">Filters</span>
+      <div class="chip-group" id="settings-filters"></div>
+    </div>
+    <div id="settings-note" class="hint secondary" hidden></div>
+    <div id="error" class="error" hidden></div>
+    <div class="actions">
+      <button id="settings-toggle" class="secondary" aria-expanded="false">
+        Settings
+      </button>
+      <button id="open">Open MagicBuyer Tab</button>
+      <button id="start">Start</button>
+      <button id="resume">Resume</button>
+      <button id="pause" class="secondary">Pause</button>
+      <button id="stop" class="danger">Stop</button>
+      <button id="clear" class="secondary">Clear Log</button>
+    </div>
+    <div id="status" class="status"></div>
+    <div class="logs" id="logs"></div>
+    <div class="hint">
+      Use the Ultimate Team web app in the active tab. The MagicBuyer tab must be initialized once per session.
+    </div>
+    <script src="dist/popup.js"></script>
+  </body>
+</html>
