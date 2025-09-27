@@ -183,6 +183,53 @@ Now in Ultimate Team Web App, new menu will be added as AutoBuyer.
 
 - If enabled tool will gives sound notification for actions like buy card / captcha trigger etc...
 
+## MySQL Login Verification Service
+
+The project now ships with a small authentication helper located at
+`app/services/auth/mysqlAuthService.js`. The helper creates a login verifier
+that talks directly to a MySQL database using the [`mysql2`](https://www.npmjs.com/package/mysql2)
+driver. To use it, install the dependency in your Node.js environment and create
+the service with your database configuration:
+
+```bash
+npm install mysql2
+# or
+yarn add mysql2
+```
+
+```js
+import bcrypt from "bcrypt";
+import { createMySQLAuthService } from "./app/services/auth";
+
+const authService = createMySQLAuthService(
+  {
+    host: "db-host",
+    user: "db-user",
+    password: "secret",
+    database: "magicbuyer",
+  },
+  {
+    tableName: "users",
+    usernameField: "email",
+    selectFields: ["id", "email", "role"],
+    // Example: integrate bcrypt comparison logic if your passwords are hashed.
+    passwordComparator: async (inputPassword, storedHash) =>
+      bcrypt.compare(inputPassword, storedHash),
+  }
+);
+
+const result = await authService.login("user@example.com", "sup3rs3cret");
+if (result.success) {
+  console.log("Logged in!", result.user);
+} else {
+  console.error("Login failed", result.reason, result.error);
+}
+```
+
+When the credentials are valid, the returned object contains the non-sensitive
+fields requested via `selectFields`. On failure, a descriptive `reason` is
+provided (`USER_NOT_FOUND`, `INVALID_PASSWORD`, or `ERROR`).
+
 ## Prerequisites
 
 - To use this tool, the user should have access to the transfer market.
