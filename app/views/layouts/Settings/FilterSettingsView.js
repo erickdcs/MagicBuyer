@@ -40,6 +40,8 @@ const filters = async () => {
 
   return filters;
 };
+
+export const getSavedFilterNames = async () => Object.keys(await filters());
 $(document).on(
   {
     change: updateMultiFilterSettings,

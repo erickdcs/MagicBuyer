@@ -24,6 +24,46 @@
         justify-content: center;
         margin-bottom: 12px;
       }
+      .settings-strip {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px 10px;
+        align-items: center;
+        margin-bottom: 12px;
+        background: rgba(255, 255, 255, 0.06);
+        padding: 8px 10px;
+        border-radius: 6px;
+      }
+      .chip-label {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #74b9ff;
+      }
+      .chip-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+      .chip {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        padding: 4px 10px;
+        font-size: 12px;
+        white-space: nowrap;
+        line-height: 1;
+      }
+      .chip.active {
+        background: #1f8eed;
+        color: #fff;
+      }
+      .chip.selected {
+        border: 1px solid #1f8eed;
+      }
+      .chip.empty {
+        opacity: 0.6;
+      }
       button {
         background: #1f8eed;
         border: none;
@@ -77,10 +117,21 @@
         margin-top: 8px;
         text-align: center;
       }
+      .hint.secondary {
+        margin-top: 0;
+        margin-bottom: 8px;
+      }
     </style>
   </head>
   <body>
     <h1>MagicBuyer Control</h1>
+    <div class="settings-strip">
+      <span class="chip-label">Settings</span>
+      <div class="chip-group" id="settings-categories"></div>
+      <span class="chip-label">Filters</span>
+      <div class="chip-group" id="settings-filters"></div>
+    </div>
+    <div id="settings-note" class="hint secondary" hidden></div>
     <div id="error" class="error" hidden></div>
     <div class="actions">
       <button id="open">Open MagicBuyer Tab</button>

@@ -48,6 +48,10 @@ const sendCommand = async (command, args = {}) => {
 const statusContainer = document.getElementById("status");
 const logsContainer = document.getElementById("logs");
 const errorContainer = document.getElementById("error");
+const categoryContainer = document.getElementById("settings-categories");
+const filtersContainer = document.getElementById("settings-filters");
+const settingsNote = document.getElementById("settings-note");
+
 
 const setError = (message) => {
   if (!message) {
@@ -94,12 +98,84 @@ const updateLogs = async () => {
   }
 };
 
+const renderChips = (container, items, active, selectedSet) => {
+  if (!container) {
+    return;
+  }
+
+  if (!items || !items.length) {
+    container.innerHTML = "<span class='chip empty'>No data</span>";
+    return;
+  }
+
+  container.innerHTML = items
+    .map((item) => {
+      const index = typeof item.index === "number" ? item.index : undefined;
+      const label = item.label || item;
+      const isActive =
+        (typeof active === "number" && typeof index === "number" && index === active) ||
+        (typeof active === "string" && label === active);
+      const isSelected = selectedSet?.has?.(label);
+      const classes = ["chip"];
+      if (isActive) {
+        classes.push("active");
+      } else if (isSelected) {
+        classes.push("selected");
+      }
+      return `<span class="${classes.join(" ")}">${label}</span>`;
+    })
+    .join("");
+};
+
+const updateSettingsSummary = async (suppressNote = false) => {
+  if (!categoryContainer || !filtersContainer) {
+    return;
+  }
+
+  try {
+    const summary = await sendCommand("getSettingsSummary");
+    const categories = summary?.categories || [];
+    const filters = summary?.filters || [];
+    const activeCategory = summary?.activeCategoryIndex ?? 0;
+    const activeFilter = summary?.activeFilter || "";
+    const selectedFilters = new Set(summary?.selectedFilters || []);
+
+    if (activeFilter) {
+      selectedFilters.add(activeFilter);
+    }
+
+    renderChips(categoryContainer, categories, activeCategory);
+    renderChips(filtersContainer, filters, activeFilter, selectedFilters);
+
+    if (settingsNote) {
+      settingsNote.textContent = "";
+      settingsNote.hidden = true;
+    }
+  } catch (error) {
+    console.warn("MagicBuyer popup: unable to load settings summary", error);
+    renderChips(categoryContainer, [], 0);
+    renderChips(filtersContainer, [], 0);
+    if (settingsNote) {
+      if (suppressNote) {
+        settingsNote.textContent = "";
+        settingsNote.hidden = true;
+      } else {
+        settingsNote.textContent =
+          "Open the MagicBuyer tab in the Ultimate Team web app to load settings and filters.";
+        settingsNote.hidden = false;
+      }
+    }
+  }
+};
+
 const withAction = (fn) => async () => {
   try {
     await fn();
     setError("");
     await updateStatus();
     await updateLogs();
+    await updateSettingsSummary(true);
+
   } catch (error) {
     setError(error?.message || "Action failed");
   }
@@ -120,7 +196,9 @@ bindButton("clear", () => sendCommand("clearLogs"));
 
 updateStatus();
 updateLogs();
+updateSettingsSummary();
 setInterval(() => {
   updateStatus();
   updateLogs();
+  updateSettingsSummary(true);
 }, 5000);

@@ -18,7 +18,12 @@ import {
   idAbStatisticsProgress,
   idAbCountDown,
   idProgressAutobuyer,
+  idFilterDropdown,
 } from "../elementIds.constants";
+import { getSettingsCategories } from "../views/layouts/MenuItemView";
+import { getSavedFilterNames } from "../views/layouts/Settings/FilterSettingsView";
+} from "../elementIds.constants";
+
 
 const PAGE_COMMAND_REQUEST = "MAGIC_BUYER_PAGE_COMMAND";
 const PAGE_COMMAND_RESPONSE = "MAGIC_BUYER_PAGE_COMMAND_RESPONSE";
@@ -60,6 +65,24 @@ const commandHandlers = {
   open: async () => {
     ensureAutoBuyerTab();
     return { opened: true };
+  },
+  getSettingsSummary: async () => {
+    const categories = getSettingsCategories();
+    const filters = await getSavedFilterNames();
+    const activeCategoryIndex = getValue("activeSettingsTab") ?? 0;
+    const filterDropdown =
+      document.getElementById(idFilterDropdown) ||
+      document.getElementById(`${idFilterDropdown}transfer`);
+    const activeFilter = filterDropdown?.value || "";
+    const selectedFilters = getValue("selectedFilters") || [];
+
+    return {
+      categories,
+      activeCategoryIndex,
+      filters,
+      activeFilter,
+      selectedFilters,
+    };
   },
 };
 
