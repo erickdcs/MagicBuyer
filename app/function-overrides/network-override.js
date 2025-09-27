@@ -1,38 +1,48 @@
-const defaultFetch = window.fetch;
-window.fetch = function (request, options) {
-  if (
-    request &&
-    (/discordapp/.test(request) || /exp.host/.test(request)) &&
-    (options.method === "POST" || options.method === "DELETE")
-  ) {
-    return new Promise((resolve, reject) => {
-      const headers = Object.assign({}, options.headers, {
-        "User-Agent": "From Node",
-      });
-      GM_xmlhttpRequest({
-        method: options.method,
-        headers,
-        url: request,
-        data: options.body,
-        onload: (res) => {
-          if (res.status === 200 || res.status === 204) {
-            res.text = () =>
-              new Promise((resolve) => resolve(res.responseText));
-            res.headers = res.responseHeaders
-              .split("\r\n")
-              .reduce(function (acc, current) {
-                var parts = current.split(": ");
-                acc.set(parts[0], parts[1]);
-                return acc;
-              }, new Map());
-            resolve(res);
-          } else {
-            reject(res);
-          }
-        },
-      });
-    });
+import { backgroundFetch } from "../services/backgroundBridge";
+
+const defaultFetch = window.fetch.bind(window);
+
+const shouldUseBackgroundFetch = (request, options = {}) => {
+  const url = typeof request === "string" ? request : request?.url || "";
+  const method = options.method || (typeof request === "object" && request?.method);
+  if (!url) {
+    return false;
   }
-  const response = defaultFetch.call(this, request, options);
-  return response;
+  return (
+    (/discordapp/.test(url) || /exp.host/.test(url)) &&
+    (method === "POST" || method === "DELETE")
+  );
+};
+
+window.fetch = async function (request, options = {}) {
+  if (!shouldUseBackgroundFetch(request, options)) {
+    return defaultFetch(request, options);
+  }
+
+  const url = typeof request === "string" ? request : request.url;
+  const method = options.method || (typeof request === "object" && request.method) || "GET";
+
+  try {
+    const responseData = await backgroundFetch({
+      method,
+      url,
+      headers: options.headers,
+      body: options.body,
+      credentials: options.credentials,
+    });
+
+    if (responseData.status === 200 || responseData.status === 204) {
+      return new Response(responseData.body ?? "", {
+        status: responseData.status,
+        statusText: responseData.statusText,
+        headers: responseData.headers,
+      });
+    }
+
+    const error = new Error(`Request failed with status ${responseData.status}`);
+    error.response = responseData;
+    throw error;
+  } catch (err) {
+    return Promise.reject(err);
+  }
 };
