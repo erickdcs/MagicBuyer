@@ -20,9 +20,11 @@ import {
   idProgressAutobuyer,
   idFilterDropdown,
 } from "../elementIds.constants";
-import { getSettingsCategories } from "../views/layouts/MenuItemView";
+import {
+  activateSettingsTab,
+  getSettingsCategories,
+} from "../views/layouts/MenuItemView";
 import { getSavedFilterNames } from "../views/layouts/Settings/FilterSettingsView";
-} from "../elementIds.constants";
 
 
 const PAGE_COMMAND_REQUEST = "MAGIC_BUYER_PAGE_COMMAND";
@@ -83,6 +85,22 @@ const commandHandlers = {
       activeFilter,
       selectedFilters,
     };
+  },
+  setActiveSettingsTab: async ({ index }) => {
+    if (typeof index !== "number" || Number.isNaN(index)) {
+      throw new Error("A valid settings index is required");
+    }
+
+    ensureAutoBuyerTab();
+
+    const updated = activateSettingsTab(index);
+    if (!updated) {
+      throw new Error(
+        "Settings are not available yet. Open the MagicBuyer tab in the web app first."
+      );
+    }
+
+    return { activeCategoryIndex: index };
   },
 };
 

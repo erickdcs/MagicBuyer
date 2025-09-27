@@ -51,6 +51,33 @@ const errorContainer = document.getElementById("error");
 const categoryContainer = document.getElementById("settings-categories");
 const filtersContainer = document.getElementById("settings-filters");
 const settingsNote = document.getElementById("settings-note");
+const settingsStrip = document.querySelector(".settings-strip");
+const settingsToggle = document.getElementById("settings-toggle");
+
+let settingsVisible = false;
+
+const setSettingsVisibility = (visible) => {
+  settingsVisible = visible;
+  if (settingsStrip) {
+    settingsStrip.hidden = !visible;
+  }
+  if (settingsNote) {
+    settingsNote.hidden = !visible || !settingsNote.textContent;
+  }
+  if (settingsToggle) {
+    settingsToggle.setAttribute("aria-expanded", String(visible));
+    settingsToggle.textContent = visible ? "Hide Settings" : "Settings";
+  }
+  if (visible) {
+    updateSettingsSummary();
+  }
+};
+
+if (settingsToggle) {
+  settingsToggle.addEventListener("click", () => {
+    setSettingsVisibility(!settingsVisible);
+  });
+}
 
 
 const setError = (message) => {
@@ -98,7 +125,7 @@ const updateLogs = async () => {
   }
 };
 
-const renderChips = (container, items, active, selectedSet) => {
+const renderChips = (container, items, active, selectedSet, options = {}) => {
   if (!container) {
     return;
   }
@@ -108,6 +135,7 @@ const renderChips = (container, items, active, selectedSet) => {
     return;
   }
 
+  const { type } = options;
   container.innerHTML = items
     .map((item) => {
       const index = typeof item.index === "number" ? item.index : undefined;
@@ -122,13 +150,25 @@ const renderChips = (container, items, active, selectedSet) => {
       } else if (isSelected) {
         classes.push("selected");
       }
-      return `<span class="${classes.join(" ")}">${label}</span>`;
+      const dataAttrs = [];
+      if (typeof index === "number") {
+        dataAttrs.push(`data-index="${index}"`);
+      }
+      if (label) {
+        dataAttrs.push(`data-label="${label}"`);
+      }
+      if (type) {
+        dataAttrs.push(`data-type="${type}"`);
+      }
+      const attributes = dataAttrs.length ? ` ${dataAttrs.join(" ")}` : "";
+      return `<button type="button" class="${classes.join(" ")}"${attributes}>${label}</button>`;
     })
     .join("");
 };
 
 const updateSettingsSummary = async (suppressNote = false) => {
-  if (!categoryContainer || !filtersContainer) {
+  if (!categoryContainer || !filtersContainer || !settingsVisible) {
+
     return;
   }
 
@@ -144,8 +184,13 @@ const updateSettingsSummary = async (suppressNote = false) => {
       selectedFilters.add(activeFilter);
     }
 
-    renderChips(categoryContainer, categories, activeCategory);
-    renderChips(filtersContainer, filters, activeFilter, selectedFilters);
+    renderChips(categoryContainer, categories, activeCategory, undefined, {
+      type: "category",
+    });
+    renderChips(filtersContainer, filters, activeFilter, selectedFilters, {
+      type: "filter",
+    });
+
 
     if (settingsNote) {
       settingsNote.textContent = "";
@@ -175,7 +220,6 @@ const withAction = (fn) => async () => {
     await updateStatus();
     await updateLogs();
     await updateSettingsSummary(true);
-
   } catch (error) {
     setError(error?.message || "Action failed");
   }
@@ -196,9 +240,40 @@ bindButton("clear", () => sendCommand("clearLogs"));
 
 updateStatus();
 updateLogs();
-updateSettingsSummary();
 setInterval(() => {
   updateStatus();
   updateLogs();
   updateSettingsSummary(true);
 }, 5000);
+
+const handleCategorySelection = async (event) => {
+  const target = event.target.closest(".chip[data-type='category']");
+  if (!target) {
+    return;
+  }
+
+  if (target.classList.contains("active")) {
+    return;
+  }
+
+  const index = Number(target.dataset.index);
+  if (Number.isNaN(index)) {
+    return;
+  }
+
+  target.disabled = true;
+  try {
+    await sendCommand("setActiveSettingsTab", { index });
+    await updateSettingsSummary(true);
+    setError("");
+  } catch (error) {
+    setError(error?.message || "Unable to activate settings");
+  } finally {
+    target.disabled = false;
+  }
+};
+
+if (categoryContainer) {
+  categoryContainer.addEventListener("click", handleCategorySelection);
+}
+

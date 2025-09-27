@@ -157,6 +157,21 @@ const hideAllSection = () => {
   });
 };
 
+export const activateSettingsTab = (index) => {
+  if (!menuItems || !settingsLookup.has(index)) {
+    return false;
+  }
+
+  menuItems.setActiveTab(index);
+
+  hideAllSection();
+  setValue("activeSettingsTab", index);
+  const selectedTab = settingsLookup.get(index).selector;
+  $(selectedTab).css("display", "");
+
+  return true;
+};
+
 const clearSettingsCache = () => {
   setValue("currentFilter", null);
   setValue("BuyerSettings", {});
