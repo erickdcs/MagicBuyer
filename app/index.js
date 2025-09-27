@@ -1,3 +1,4 @@
+import "./vendor/jquery";
 import { isMarketAlertApp } from "./app.constants";
 import { initOverrides } from "./function-overrides";
 import { cssOverride } from "./function-overrides/css-override";
