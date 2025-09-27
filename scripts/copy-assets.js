@@ -45,6 +45,18 @@ const main = () => {
     }
 
     fs.rmSync(toPath, { recursive: true, force: true });
+
+    if (asset === 'popup.html') {
+      const originalContent = fs.readFileSync(fromPath, 'utf8');
+      const updatedContent = originalContent.replace(
+        'src="dist/popup.js"',
+        'src="popup.js"'
+      );
+      fs.mkdirSync(path.dirname(toPath), { recursive: true });
+      fs.writeFileSync(toPath, updatedContent);
+      return;
+    }
+
     copyRecursiveSync(fromPath, toPath);
   });
 };
