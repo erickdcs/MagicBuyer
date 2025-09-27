@@ -4293,20 +4293,6 @@ webpack-sources@^3.3.3:
   resolved "https://registry.npmjs.org/webpack-sources/-/webpack-sources-3.3.3.tgz"
   integrity sha512-yd1RBzSGanHkitROoPFd6qsrxt+oFhg/129YzheDGqeustzX0vTZJZsSsQjVQC4yzBQ56K55XU8gaNCtIzOnTg==
 
-webpack-userscript@^2.5.8:
-  version "2.5.8"
-  resolved "https://registry.npmjs.org/webpack-userscript/-/webpack-userscript-2.5.8.tgz"
-  integrity sha512-C0zb8meYQY5pW7WeGu7ftOL6LwSa1ILTHU4ftM+bz2Mjgi8r8MrCyY4cld3YQAVXhQX9MY+ZYPF86Rn0K2iPNA==
-  dependencies:
-    "@tkausl/userscript-meta" "^1.0.2"
-    dev-null "^0.1.1"
-    lodash.pick "^4.4.0"
-    pkg-up "^3.1.0"
-    request "^2.88.0"
-    schema-utils "^1.0.0"
-    ssri "^8.0.1"
-    webpack-sources "^1.4.3"
-
 webpack@^4.0.0, "webpack@^4.0.0 || ^5.0.0", webpack@^5.1.0, webpack@^5.101.3, webpack@^5.82.0:
   version "5.101.3"
   resolved "https://registry.npmjs.org/webpack/-/webpack-5.101.3.tgz"

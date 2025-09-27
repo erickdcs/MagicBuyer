@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "MagicBuyer-UT",
+  "version": "2.0.0",
+  "description": "UT Auto Buyer - French version",
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.ea.com/*/ea-sports-fc/ultimate-team/web-app/*",
+        "https://www.ea.com/ea-sports-fc/ultimate-team/web-app/*"
+      ],
+      "js": ["dist/magicbuyer.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "host_permissions": [
+    "https://www.ea.com/*",
+    "https://www.ea2.com/*",
+    "https://futbin.com/*",
+    "https://futwiz.com/*",
+    "https://discordapp.com/*",
+    "https://futbin.org/*",
+    "https://exp.host/*"
+  ]
+}

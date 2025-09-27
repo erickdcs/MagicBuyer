@@ -7,7 +7,7 @@
     "build:dev": "webpack --mode development",
     "build:prod": "webpack --mode production",
     "serve": "webpack serve --mode development",
-    "build:mobile": "npx babel  dist/fut-auto-buyer.user.js --out-file dist/fut-auto-buyer.mobile.js --presets babel-preset-es2015"
+    "build:mobile": "npx babel dist/magicbuyer.js --out-file dist/magicbuyer.mobile.js --presets babel-preset-es2015"
   },
   "repository": {
     "type": "git",
@@ -21,7 +21,6 @@
     "terser-webpack-plugin": "^5.1.4",
     "webpack": "^5.101.3",
     "webpack-cli": "^6.0.1",
-    "webpack-dev-server": "^3.11.2",
-    "webpack-userscript": "^2.5.8"
+    "webpack-dev-server": "^3.11.2"
   }
 }
