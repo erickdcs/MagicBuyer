@@ -58,22 +58,7 @@ export const searchTransferMarket = function (buyerSetting) {
 
     sendPinEvents("Transfer Market Search");
     updateRequestCount();
-    const searchContext =
-      this && this._viewmodel ? this : getValue("AutoBuyerInstance");
-
-    const viewModel = searchContext && searchContext._viewmodel;
-
-    if (!viewModel || !viewModel.searchCriteria) {
-      writeToLog(
-        "skip search >>> (Search criteria unavailable)",
-        idProgressAutobuyer,
-        null,
-        "error"
-      );
-      return resolve();
-    }
-
-    let searchCriteria = viewModel.searchCriteria;
+    let searchCriteria = this._viewmodel.searchCriteria;
     if (useRandMinBid)
       searchCriteria.minBid = roundOffPrice(
         getRandNum(0, buyerSetting["idAbRandMinBidInput"])
@@ -85,7 +70,7 @@ export const searchTransferMarket = function (buyerSetting) {
     services.Item.clearTransferMarketCache();
 
     services.Item.searchTransferMarket(searchCriteria, currentPage).observe(
-      searchContext,
+      this,
       async function (sender, response) {
         if (response.success) {
           setValue("searchFailedCount", 0);
