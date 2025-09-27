@@ -8,6 +8,7 @@ const assets = [
   'manifest.json',
   'background.js',
   'contentScript.js',
+  'popup.html',
   'external',
   'storeImg',
 ];

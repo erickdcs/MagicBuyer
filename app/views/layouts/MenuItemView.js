@@ -50,6 +50,12 @@ settingsLookup.set(7, {
 let menuRoot;
 let menuItems;
 
+export const getSettingsCategories = () =>
+  Array.from(settingsLookup.entries()).map(([index, value]) => ({
+    index,
+    label: value.label,
+  }));
+
 export const generateMenuItems = function () {
   menuItems = new EAFilterBarView();
   settingsLookup.forEach((value, key) => {
@@ -57,6 +63,8 @@ export const generateMenuItems = function () {
   });
   menuItems.setActiveTab(0);
   menuItems.layoutSubviews();
+
+  setValue("activeSettingsTab", 0);
 
   menuItems.addTarget(this, onSettingChange, EventType.TAP);
   menuItems.__root.style = "margin-top: 20px;";
@@ -96,6 +104,7 @@ export const updateCommonSettings = async (isInit) => {
 
 const appendMenuItems = async function (isInit) {
   menuItems.setActiveTab(0);
+  setValue("activeSettingsTab", 0);
   menuRoot.append(buySettingsView.call(this));
   menuRoot.append(sellSettingsView.call(this));
   menuRoot.append(searchSettingsView.call(this));
@@ -137,6 +146,7 @@ const deleteAllMenu = () => {
 
 const onSettingChange = function (e, t, i) {
   hideAllSection();
+  setValue("activeSettingsTab", i.index);
   const selectedTab = settingsLookup.get(i.index).selector;
   $(selectedTab).css("display", "");
 };
