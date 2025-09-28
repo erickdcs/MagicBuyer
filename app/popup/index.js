@@ -1,279 +1,177 @@
-const PAGE_COMMAND_REQUEST = "MAGIC_BUYER_PAGE_COMMAND";
+// app/index.js
+import { initPageCommandBridge } from "../services/pageCommandBridge";
+import { clearLogs } from "../utils/logUtil";
+import { setValue, getValue } from "../services/repository";
 
-const queryActiveTab = () => {
-  return new Promise((resolve, reject) => {
+import {
+  idAbStatus,
+  idAbRequestCount,
+  idAbCoins,
+  idAbProfit,
+  idWinCount,
+  idAbSoldItems,
+  idAbUnsoldItems,
+  idAbAvailableItems,
+  idAbActiveTransfers,
+  idAbSearchProgress,
+  idAbStatisticsProgress,
+  idAbCountDown,
+  idProgressAutobuyer,
+  idFilterDropdown,
+} from "../elementIds.constants";
+
+function ensureMagicBuyerTab() {
+  const tabBar = document.querySelector(".ut-tab-bar");
+  if (!tabBar || tabBar.querySelector('[data-mb-tab="true"]')) return;
+
+  const li = document.createElement("a");
+  li.className = "ut-tab-bar-item";
+  li.setAttribute("role", "button");
+  li.setAttribute("data-mb-tab", "true");
+  li.textContent = "MagicBuyer";
+  li.addEventListener("click", openMagicBuyer);
+  tabBar.appendChild(li);
+}
+
+function openMagicBuyer() {
+  // contenedor principal/equivalente de la app UT
+  const root = document.querySelector(".ut-content") || document.body;
+
+  // limpia y crea root para nuestra vista
+  let panel = document.getElementById("magic-buyer-root");
+  if (!panel) {
+    panel = document.createElement("div");
+    panel.id = "magic-buyer-root";
+    root.appendChild(panel);
+  }
+  panel.innerHTML = getLayoutHtml();
+  wireUpBasicUi();
+  setValue("AutoBuyerInstance", window); // para que pageCommandBridge/handlers tengan un "instance"
+}
+
+function getLayoutHtml() {
+  // Layout mínimo con los IDs que esperan tus servicios/handlers
+  return `
+  <div class="mb-wrap">
+    <div class="mb-header">
+      <h1>MagicBuyer</h1>
+      <div class="mb-controls">
+        <button id="mb-start" class="btn">Start</button>
+        <button id="mb-resume" class="btn">Resume</button>
+        <button id="mb-pause" class="btn">Pause</button>
+        <button id="mb-stop" class="btn">Stop</button>
+        <button id="mb-clear" class="btn">Clear Logs</button>
+      </div>
+    </div>
+
+    <div class="mb-grid">
+      <div class="mb-card">
+        <h3>Status</h3>
+        <div><strong>Estado:</strong> <span id="${idAbStatus}">—</span></div>
+        <div><strong>Requests:</strong> <span id="${idAbRequestCount}">0</span></div>
+        <div><strong>Coins:</strong> <span id="${idAbCoins}">0</span></div>
+        <div><strong>Profit:</strong> <span id="${idAbProfit}">0</span></div>
+        <div><strong>Won:</strong> <span id="${idWinCount}">0</span></div>
+        <div><strong>Sold:</strong> <span id="${idAbSoldItems}">0</span></div>
+        <div><strong>Unsold:</strong> <span id="${idAbUnsoldItems}">0</span></div>
+        <div><strong>Available:</strong> <span id="${idAbAvailableItems}">0</span></div>
+        <div><strong>Active transfers:</strong> <span id="${idAbActiveTransfers}">0</span></div>
+        <div><strong>Countdown:</strong> <span id="${idAbCountDown}">—</span></div>
+      </div>
+
+      <div class="mb-card">
+        <h3>Progress</h3>
+        <div class="progress">
+          <div id="${idAbSearchProgress}" class="progress-bar" style="width:0%"></div>
+        </div>
+        <div class="progress">
+          <div id="${idAbStatisticsProgress}" class="progress-bar" style="width:0%"></div>
+        </div>
+      </div>
+
+      <div class="mb-card">
+        <h3>Filters</h3>
+        <select id="${idFilterDropdown}">
+          <option value="">— Select Filter —</option>
+        </select>
+      </div>
+
+      <div class="mb-card mb-logs">
+        <h3>Logs</h3>
+        <div id="${idProgressAutobuyer}" class="mb-logbox"></div>
+      </div>
+    </div>
+  </div>
+  `;
+}
+
+function wireUpBasicUi() {
+  const $ = (id) => document.getElementById(id);
+
+  $("mb-start").onclick = () => window.postMessage({ type: "MAGIC_BUYER_PAGE_COMMAND", id: "start1", payload: { command: "start" } }, "*");
+  $("mb-resume").onclick = () => window.postMessage({ type: "MAGIC_BUYER_PAGE_COMMAND", id: "resume1", payload: { command: "resume" } }, "*");
+  $("mb-pause").onclick = () => window.postMessage({ type: "MAGIC_BUYER_PAGE_COMMAND", id: "pause1", payload: { command: "pause" } }, "*");
+  $("mb-stop").onclick = () => window.postMessage({ type: "MAGIC_BUYER_PAGE_COMMAND", id: "stop1", payload: { command: "stop" } }, "*");
+  $("mb-clear").onclick = () => clearLogs();
+}
+
+// Estilos mínimos (puedes moverlos a un .css si prefieres)
+function injectStyles() {
+  if (document.getElementById("mb-styles")) return;
+  const style = document.createElement("style");
+  style.id = "mb-styles";
+  style.textContent = `
+    .mb-wrap { padding: 16px; }
+    .mb-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+    .mb-controls .btn { margin-right:8px; }
+    .mb-grid { display:grid; grid-template-columns: 1fr 1fr; gap:16px; }
+    .mb-card { background:#111; color:#eee; padding:12px; border-radius:8px; }
+    .progress { background:#333; height:10px; border-radius:6px; overflow:hidden; margin:8px 0; }
+    .progress-bar { background:#2aa; height:10px; transition:width .3s ease; }
+    .mb-logs { grid-column: 1 / span 2; }
+    .mb-logbox { background:#000; min-height:160px; border:1px solid #333; padding:8px; overflow:auto; }
+    .ut-tab-bar-item[data-mb-tab="true"] { cursor:pointer; }
+  `;
+  document.head.appendChild(style);
+}
+
+// app/popup/index.js (solo el fragmento del botón Settings)
+
+function openOptionsPage() {
+  try {
+    if (chrome.runtime?.openOptionsPage) chrome.runtime.openOptionsPage();
+    else window.open(chrome.runtime.getURL("options.html"), "_blank");
+  } catch (e) {
+    console.error("Error opening options:", e);
+  }
+}
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("btn-settings")?.addEventListener("click", () => {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      if (chrome.runtime.lastError) {
-        reject(chrome.runtime.lastError);
-        return;
-      }
-      if (!tabs || !tabs.length) {
-        reject(new Error("No active tab"));
-        return;
-      }
-      resolve(tabs[0]);
+      if (!tabs?.length) return;
+      chrome.tabs.sendMessage(tabs[0].id, { type: "MB_OPEN_SETTINGS" });
     });
   });
-};
+});
 
-const sendCommand = async (command, args = {}) => {
-  const tab = await queryActiveTab();
-  return new Promise((resolve, reject) => {
-    chrome.tabs.sendMessage(
-      tab.id,
-      {
-        type: PAGE_COMMAND_REQUEST,
-        payload: { command, args },
-        id: `${Date.now()}-${Math.random()}`,
-      },
-      (response) => {
-        if (chrome.runtime.lastError) {
-          reject(chrome.runtime.lastError);
-          return;
-        }
-        if (!response) {
-          reject(new Error("No response from content script"));
-          return;
-        }
-        if (!response.success) {
-          reject(new Error(response.error || "Command failed"));
-          return;
-        }
-        resolve(response.payload);
-      }
-    );
-  });
-};
 
-const statusContainer = document.getElementById("status");
-const logsContainer = document.getElementById("logs");
-const errorContainer = document.getElementById("error");
-const categoryContainer = document.getElementById("settings-categories");
-const filtersContainer = document.getElementById("settings-filters");
-const settingsNote = document.getElementById("settings-note");
-const settingsStrip = document.querySelector(".settings-strip");
-const settingsToggle = document.getElementById("settings-toggle");
+function boot() {
+  injectStyles();
+  initPageCommandBridge();
 
-let settingsVisible = false;
+  // espera la UI de la webapp y añade el tab
+  const iv = setInterval(() => {
+    try {
+      ensureMagicBuyerTab();
+    } catch {}
+  }, 800);
 
-const setSettingsVisibility = (visible) => {
-  settingsVisible = visible;
-  if (settingsStrip) {
-    settingsStrip.hidden = !visible;
-  }
-  if (settingsNote) {
-    settingsNote.hidden = !visible || !settingsNote.textContent;
-  }
-  if (settingsToggle) {
-    settingsToggle.setAttribute("aria-expanded", String(visible));
-    settingsToggle.textContent = visible ? "Hide Settings" : "Settings";
-  }
-  if (visible) {
-    updateSettingsSummary();
-  }
-};
-
-if (settingsToggle) {
-  settingsToggle.addEventListener("click", () => {
-    setSettingsVisibility(!settingsVisible);
-  });
+  // opcional: abrir automáticamente el panel al inyectar
+  // openMagicBuyer();
 }
 
-
-const setError = (message) => {
-  if (!message) {
-    errorContainer.textContent = "";
-    errorContainer.hidden = true;
-    return;
-  }
-  errorContainer.textContent = message;
-  errorContainer.hidden = false;
-};
-
-const updateStatus = async () => {
-  try {
-    const status = await sendCommand("getStatus");
-    const items = [
-      ["State", status.statusText || "Unknown"],
-      ["Requests", status.requestCount || "0"],
-      ["Coins", status.coins || "0"],
-      ["Profit", status.profit || "0"],
-      ["Won", status.won || "0"],
-      ["Sold", status.sold || "0"],
-      ["Unsold", status.unsold || "0"],
-      ["Available", status.available || "0"],
-      ["Active transfers", status.activeTransfers || "0"],
-      ["Countdown", status.countdown || "00:00:00"],
-    ];
-    statusContainer.innerHTML = items
-      .map(([label, value]) => `<div><strong>${label}:</strong> ${value}</div>`)
-      .join("");
-    setError("");
-  } catch (error) {
-    statusContainer.innerHTML = "";
-    setError(error?.message || "Unable to fetch status");
-  }
-};
-
-const updateLogs = async () => {
-  try {
-    const { html } = await sendCommand("getLogs");
-    logsContainer.innerHTML = `<ul>${html || ""}</ul>`;
-  } catch (error) {
-    logsContainer.innerHTML = "<em>Unable to load logs.</em>";
-    setError(error?.message || "Unable to load logs");
-  }
-};
-
-const renderChips = (container, items, active, selectedSet, options = {}) => {
-  if (!container) {
-    return;
-  }
-
-  if (!items || !items.length) {
-    container.innerHTML = "<span class='chip empty'>No data</span>";
-    return;
-  }
-
-  const { type } = options;
-  container.innerHTML = items
-    .map((item) => {
-      const index = typeof item.index === "number" ? item.index : undefined;
-      const label = item.label || item;
-      const isActive =
-        (typeof active === "number" && typeof index === "number" && index === active) ||
-        (typeof active === "string" && label === active);
-      const isSelected = selectedSet?.has?.(label);
-      const classes = ["chip"];
-      if (isActive) {
-        classes.push("active");
-      } else if (isSelected) {
-        classes.push("selected");
-      }
-      const dataAttrs = [];
-      if (typeof index === "number") {
-        dataAttrs.push(`data-index="${index}"`);
-      }
-      if (label) {
-        dataAttrs.push(`data-label="${label}"`);
-      }
-      if (type) {
-        dataAttrs.push(`data-type="${type}"`);
-      }
-      const attributes = dataAttrs.length ? ` ${dataAttrs.join(" ")}` : "";
-      return `<button type="button" class="${classes.join(" ")}"${attributes}>${label}</button>`;
-    })
-    .join("");
-};
-
-const updateSettingsSummary = async (suppressNote = false) => {
-  if (!categoryContainer || !filtersContainer || !settingsVisible) {
-
-    return;
-  }
-
-  try {
-    const summary = await sendCommand("getSettingsSummary");
-    const categories = summary?.categories || [];
-    const filters = summary?.filters || [];
-    const activeCategory = summary?.activeCategoryIndex ?? 0;
-    const activeFilter = summary?.activeFilter || "";
-    const selectedFilters = new Set(summary?.selectedFilters || []);
-
-    if (activeFilter) {
-      selectedFilters.add(activeFilter);
-    }
-
-    renderChips(categoryContainer, categories, activeCategory, undefined, {
-      type: "category",
-    });
-    renderChips(filtersContainer, filters, activeFilter, selectedFilters, {
-      type: "filter",
-    });
-
-
-    if (settingsNote) {
-      settingsNote.textContent = "";
-      settingsNote.hidden = true;
-    }
-  } catch (error) {
-    console.warn("MagicBuyer popup: unable to load settings summary", error);
-    renderChips(categoryContainer, [], 0);
-    renderChips(filtersContainer, [], 0);
-    if (settingsNote) {
-      if (suppressNote) {
-        settingsNote.textContent = "";
-        settingsNote.hidden = true;
-      } else {
-        settingsNote.textContent =
-          "Open the MagicBuyer tab in the Ultimate Team web app to load settings and filters.";
-        settingsNote.hidden = false;
-      }
-    }
-  }
-};
-
-const withAction = (fn) => async () => {
-  try {
-    await fn();
-    setError("");
-    await updateStatus();
-    await updateLogs();
-    await updateSettingsSummary(true);
-  } catch (error) {
-    setError(error?.message || "Action failed");
-  }
-};
-
-const bindButton = (id, handler) => {
-  const el = document.getElementById(id);
-  if (!el) return;
-  el.addEventListener("click", withAction(handler));
-};
-
-bindButton("open", () => sendCommand("open"));
-bindButton("start", () => sendCommand("start"));
-bindButton("resume", () => sendCommand("resume"));
-bindButton("pause", () => sendCommand("pause"));
-bindButton("stop", () => sendCommand("stop"));
-bindButton("clear", () => sendCommand("clearLogs"));
-
-updateStatus();
-updateLogs();
-setInterval(() => {
-  updateStatus();
-  updateLogs();
-  updateSettingsSummary(true);
-}, 5000);
-
-const handleCategorySelection = async (event) => {
-  const target = event.target.closest(".chip[data-type='category']");
-  if (!target) {
-    return;
-  }
-
-  if (target.classList.contains("active")) {
-    return;
-  }
-
-  const index = Number(target.dataset.index);
-  if (Number.isNaN(index)) {
-    return;
-  }
-
-  target.disabled = true;
-  try {
-    await sendCommand("setActiveSettingsTab", { index });
-    await updateSettingsSummary(true);
-    setError("");
-  } catch (error) {
-    setError(error?.message || "Unable to activate settings");
-  } finally {
-    target.disabled = false;
-  }
-};
-
-if (categoryContainer) {
-  categoryContainer.addEventListener("click", handleCategorySelection);
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", boot);
+} else {
+  boot();
 }
-

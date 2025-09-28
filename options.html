@@ -1,0 +1,92 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>MagicBuyer — Settings</title>
+    <meta name="color-scheme" content="dark light" />
+    <style>
+      :root { color-scheme: dark light; }
+      body { margin:0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; background:#0b1220; color:#e5e7eb; }
+      .wrap { max-width: 980px; margin: 0 auto; padding: 20px; }
+      h1 { font-size: 20px; margin:0 0 16px; letter-spacing:.2px; }
+      .card { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.08); border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+      .row { display:grid; grid-template-columns: 240px 1fr; gap:12px; align-items:center; margin-bottom:12px; }
+      label { font-weight: 600; color:#93c5fd; }
+      input[type="number"], select {
+        max-width: 260px; padding: 8px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,.16);
+        background: rgba(0,0,0,.25); color:#e5e7eb;
+      }
+      input[type="checkbox"] { transform: scale(1.1); }
+      .chips { display:flex; gap:8px; flex-wrap:wrap; }
+      .chip { background: rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.12); padding:6px 10px; border-radius:16px; font-size:12px; }
+      .actions { display:flex; gap:8px; justify-content:flex-end; margin-top: 14px; }
+      .btn { border:0; border-radius:10px; padding:10px 14px; cursor:pointer; font-weight:600; }
+      .btn-primary { background:#2563eb; color:#fff; }
+      .btn-secondary { background:#334155; color:#fff; }
+      .toast {
+        position: fixed; left: 50%; transform: translateX(-50%) translateY(20px);
+        bottom: 20px; background: #111827; color:#fff; padding: 10px 16px; border-radius: 10px;
+        opacity:0; transition: opacity .25s, transform .25s; z-index: 9999; border:1px solid #374151;
+      }
+      .toast.show { opacity:1; transform: translateX(-50%) translateY(0); }
+      .hint { color:#9ca3af; font-size:12px; }
+      @media (prefers-color-scheme: light){
+        body { background:#f3f4f6; color:#111827; }
+        .card { background:#fff; border-color:#e5e7eb; }
+        input[type="number"], select { background:#fff; color:#111827; border-color:#cbd5e1; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <h1>MagicBuyer — Settings</h1>
+
+      <div class="card">
+        <div class="row">
+          <label for="opt-enabled">Enable MagicBuyer</label>
+          <input id="opt-enabled" type="checkbox" />
+        </div>
+
+        <div class="row">
+          <label for="opt-theme">Theme</label>
+          <select id="opt-theme">
+            <option value="system">System</option>
+            <option value="dark">Dark</option>
+            <option value="light">Light</option>
+          </select>
+        </div>
+
+        <div class="row">
+          <label for="opt-interval">Search interval (ms)</label>
+          <input id="opt-interval" type="number" min="300" max="10000" step="50" />
+          <div class="hint">Between 300 and 10000 ms.</div>
+        </div>
+
+        <div class="row">
+          <label for="opt-default-filter">Default filter</label>
+          <select id="opt-default-filter"></select>
+        </div>
+
+        <div class="row">
+          <label>Active categories</label>
+          <div class="chips" id="opt-categories">
+            <!-- ejemplo visual; si quieres, después lo salvamos también -->
+            <span class="chip">General</span>
+            <span class="chip">Buyer</span>
+            <span class="chip">Safety</span>
+            <span class="chip">Logs</span>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button id="btn-reset" class="btn btn-secondary" type="button">Reset</button>
+          <button id="btn-save" class="btn btn-primary" type="button">Save</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+    <script type="module" src="dist/options.bundle.js"></script>
+  </body>
+</html>

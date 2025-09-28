@@ -5,6 +5,30 @@ import { cssOverride } from "./function-overrides/css-override";
 import { initListeners } from "./services/listeners";
 import { initPageCommandBridge } from "./services/pageCommandBridge";
 
+function ensureMagicBuyerTab() {
+  const tabBar = document.querySelector(".ut-tab-bar");
+  if (!tabBar || tabBar.querySelector('[data-mb-tab="true"]')) return;
+
+  const li = document.createElement("a");
+  li.className = "ut-tab-bar-item";
+  li.setAttribute("role", "button");
+  li.setAttribute("data-mb-tab", "true");
+  li.textContent = "MagicBuyer";
+  tabBar.appendChild(li);
+
+  // El click real lo resolverá open/openSettings del bridge (lo pulsamos vía handler)
+}
+function boot() {
+  initPageCommandBridge();
+  const iv = setInterval(() => {
+    try { ensureMagicBuyerTab(); } catch {}
+  }, 800);
+}
+
+document.readyState === "loading"
+  ? document.addEventListener("DOMContentLoaded", boot)
+  : boot();
+  
 const initAutobuyer = function () {
   let isHomePageLoaded = false;
   isPhone() && $("body").removeClass("landscape").addClass("phone");

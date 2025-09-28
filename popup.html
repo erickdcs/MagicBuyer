@@ -145,30 +145,21 @@
   </head>
   <body>
     <h1>MagicBuyer Control</h1>
-    <div class="settings-strip" hidden>
-      <span class="chip-label">Settings</span>
-      <div class="chip-group" id="settings-categories"></div>
-      <span class="chip-label">Filters</span>
-      <div class="chip-group" id="settings-filters"></div>
-    </div>
-    <div id="settings-note" class="hint secondary" hidden></div>
-    <div id="error" class="error" hidden></div>
+
     <div class="actions">
-      <button id="settings-toggle" class="secondary" aria-expanded="false">
-        Settings
-      </button>
-      <button id="open">Open MagicBuyer Tab</button>
+      <button id="btn-settings" type="button">Settings</button>
       <button id="start">Start</button>
       <button id="resume">Resume</button>
       <button id="pause" class="secondary">Pause</button>
       <button id="stop" class="danger">Stop</button>
       <button id="clear" class="secondary">Clear Log</button>
     </div>
+
     <div id="status" class="status"></div>
     <div class="logs" id="logs"></div>
-    <div class="hint">
-      Use the Ultimate Team web app in the active tab. The MagicBuyer tab must be initialized once per session.
-    </div>
-    <script src="dist/popup.js"></script>
+    <div class="hint">Use the Ultimate Team web app in the active tab…</div>
+
+    <!-- 👇 solo este -->
+    <script type="module" src="dist/popup.bundle.js"></script>
   </body>
 </html>

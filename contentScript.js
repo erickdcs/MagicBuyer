@@ -74,7 +74,16 @@
   };
 
   window.addEventListener("message", handlePageRequest);
-
+  chrome.runtime.onMessage.addListener((msg) => {
+    if (msg?.type === "MB_OPEN_SETTINGS") {
+      // Pide a la página que abra la pestaña MagicBuyer y salte a Settings (layout del dev)
+      window.postMessage({
+        type: "MAGIC_BUYER_PAGE_COMMAND",
+        id: "openSettings",
+        payload: { command: "openSettings" }
+      }, "*");
+    }
+  });
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message?.type !== PAGE_COMMAND_REQUEST) {
       return false;

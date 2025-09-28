@@ -3,12 +3,14 @@ const TerserPlugin = require("terser-webpack-plugin");
 
 module.exports = {
   entry: {
-    magicbuyer: "./app/index.js",
+    content: "./app/index.js",
     popup: "./app/popup/index.js",
+    options: "./app/options/index.js", 
   },
   output: {
     path: path.resolve(__dirname, "dist"),
-    filename: "[name].js",
+    filename: "[name].bundle.js",
+    clean: false
   },
   devServer: {
     contentBase: path.resolve(__dirname, "dist"),
