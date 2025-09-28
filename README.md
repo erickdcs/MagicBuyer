@@ -230,6 +230,71 @@ When the credentials are valid, the returned object contains the non-sensitive
 fields requested via `selectFields`. On failure, a descriptive `reason` is
 provided (`USER_NOT_FOUND`, `INVALID_PASSWORD`, or `ERROR`).
 
+## Mandatory login for MagicBuyer
+
+Starting with this version the MagicBuyer view is locked behind an
+authentication screen. When the userscript loads, a modal prompts for the
+credentials that will be validated against a MySQL database. Only after a
+successful login the AutoBuyer controls, logs, and statistics will be rendered.
+
+### Running the bundled authentication server
+
+This repository now includes a lightweight Express server that exposes the
+`/api/login` endpoint consumed by the userscript. The server relies on the
+`createMySQLAuthService` helper and must be configured through environment
+variables before starting it:
+
+```bash
+# Install the required backend dependencies (express, cors, mysql2) if you have
+# not done it already
+npm install
+
+# Provide your connection details and start the auth server
+MAGICBUYER_DB_HOST=localhost \
+MAGICBUYER_DB_USER=magicbuyer \
+MAGICBUYER_DB_PASSWORD=supersecret \
+MAGICBUYER_DB_NAME=magicbuyer \
+npm run auth:server
+```
+
+Supported environment variables:
+
+| Variable | Description |
+| --- | --- |
+| `MAGICBUYER_DB_HOST` | Hostname or IP of the MySQL server. |
+| `MAGICBUYER_DB_PORT` | Optional port number. |
+| `MAGICBUYER_DB_USER` | Database user used for authentication queries. |
+| `MAGICBUYER_DB_PASSWORD` | Password of the database user. |
+| `MAGICBUYER_DB_NAME` | Database that contains the credentials table. |
+| `MAGICBUYER_DB_TABLE` | Table with the credential records. Defaults to `users`. |
+| `MAGICBUYER_DB_USERNAME_FIELD` | Column containing the username/email. Defaults to `username`. |
+| `MAGICBUYER_DB_PASSWORD_FIELD` | Column containing the stored password. Defaults to `password`. |
+| `MAGICBUYER_DB_SELECT_FIELDS` | Comma separated list of extra fields returned in the response. |
+| `MAGICBUYER_AUTH_PORT` | Port used by the server (defaults to `3030`). |
+| `MAGICBUYER_AUTH_ORIGINS` | Comma separated list of origins allowed by CORS. |
+| `MAGICBUYER_AUTH_SESSION_TTL` | Session duration in seconds (defaults to 3600). |
+| `MAGICBUYER_AUTH_SESSION_TTL_MS` | Session duration in milliseconds (overrides `MAGICBUYER_AUTH_SESSION_TTL`). |
+
+The MagicBuyer userscript expects the login endpoint to be available at
+`http://localhost:3030/api/login`. If you host the server somewhere else, set
+the desired URL before the script loads:
+
+```js
+// Example of overriding the default endpoint from the browser console
+window.MAGIC_BUYER_AUTH_ENDPOINT = "https://mi-servidor.com/api/login";
+```
+
+Advanced users can persist the endpoint with the Tampermonkey storage API:
+
+```js
+// Within the userscript context
+GM_setValue("magicbuyer.auth.endpoint", "https://mi-servidor.com/api/login");
+```
+
+After authenticating, the logged user is shown next to the MagicBuyer title and
+the session remains active until the configured TTL expires. When the session is
+invalidated the login prompt will be displayed again on the next visit.
+
 ## Prerequisites
 
 - To use this tool, the user should have access to the transfer market.

@@ -1,6 +1,11 @@
-import { idFilterDropdown, idLog } from "../elementIds.constants";
+import { idAbStatus, idFilterDropdown, idLog } from "../elementIds.constants";
 import * as processors from "../handlers/autobuyerProcessor";
 import { statsProcessor } from "../handlers/statsProcessor";
+import {
+  getAuthenticatedUser,
+  isAuthenticated,
+  requireAuthentication,
+} from "../services/auth/loginManager";
 import { getValue, setValue } from "../services/repository";
 import { updateSettingsView } from "../utils/commonUtil";
 import { clearLogs } from "../utils/logUtil";
@@ -30,12 +35,51 @@ JSUtils.inherits(
 
 AutoBuyerViewController.prototype.init = function () {
   searchFiltersViewInit.call(this);
-  let view = this.getView();
-  if (!isPhone()) view.__root.style = "width: 100%; float: left;";
   setValue("AutoBuyerInstance", this);
 
-  const menuItems = generateMenuItems.call(this);
+  requireAuthentication()
+    .then(() => {
+      initializeAutoBuyerLayout.call(this);
+    })
+    .catch((error) => {
+      /* eslint-disable no-console */
+      console.error("No se pudo completar la autenticación de MagicBuyer", error);
+      /* eslint-enable no-console */
+    });
+};
+
+AutoBuyerViewController.prototype.viewDidAppear = function () {
+  this.getNavigationController().setNavigationVisibility(true, true);
+  searchFiltersViewAppear.call(this, false);
+};
+
+UTMarketSearchFiltersViewController.prototype.viewDidAppear = function () {
+  searchFiltersViewAppear.call(this, true);
+};
+
+const searchFiltersViewAppear = function (isTransferSearch) {
+  searchFiltersAppear.call(this);
+  let view = this.getView();
   let root = $(view.__root);
+  if (!root.find(".filter-place").length) {
+    filterHeaderSettingsView.call(this, isTransferSearch).then((res) => {
+      root.find(".ut-item-search-view").first().prepend(res);
+    });
+  }
+};
+
+AutoBuyerViewController.prototype.getNavigationTitle = function () {
+  return `MagicBuyer`;
+};
+
+const initializeAutoBuyerLayout = function () {
+  const view = this.getView();
+  if (!isPhone() && view && view.__root) {
+    view.__root.style = "width: 100%; float: left;";
+  }
+
+  const menuItems = generateMenuItems.call(this);
+  const root = $(view.__root);
   const createButtonWithContext = createButton.bind(this);
   const stopBtn = createButtonWithContext("Stop", () =>
     stopAutoBuyer.call(this)
@@ -78,40 +122,43 @@ AutoBuyerViewController.prototype.init = function () {
   btnContainer.append($(clearLogBtn.__root));
   $(menuItems.__root).find(".menu-container").addClass("settings-menu");
   root.find(".search-prices").append(menuItems.__root);
+
+  decorateNavigationAfterLogin();
 };
 
-AutoBuyerViewController.prototype.viewDidAppear = function () {
-  this.getNavigationController().setNavigationVisibility(true, true);
-  searchFiltersViewAppear.call(this, false);
-};
-
-UTMarketSearchFiltersViewController.prototype.viewDidAppear = function () {
-  searchFiltersViewAppear.call(this, true);
-};
-
-const searchFiltersViewAppear = function (isTransferSearch) {
-  searchFiltersAppear.call(this);
-  let view = this.getView();
-  let root = $(view.__root);
-  if (!root.find(".filter-place").length) {
-    filterHeaderSettingsView.call(this, isTransferSearch).then((res) => {
-      root.find(".ut-item-search-view").first().prepend(res);
-    });
+const decorateNavigationAfterLogin = () => {
+  if (!isAuthenticated()) {
+    return;
   }
-};
 
-AutoBuyerViewController.prototype.getNavigationTitle = function () {
   setTimeout(() => {
     const title = $(".title");
+    if (!title.length) {
+      return;
+    }
+
     isPhone() && title.addClass("buyer-header");
+    title.find(".magicbuyer-user-badge").remove();
     $(".view-navbar-currency").remove();
     $(".view-navbar-clubinfo").remove();
+    title.find(`#${idAbStatus}`).remove();
+
+    const user = getAuthenticatedUser();
+    if (user) {
+      const displayName =
+        user.username || user.email || user.name || user.id || "Usuario";
+      const badge = $("<span>")
+        .addClass("magicbuyer-user-badge")
+        .text(`Conectado como ${displayName}`);
+      title.append(badge);
+    }
+
     title.append(BuyerStatus());
     $(HeaderView()).insertAfter(title);
-    $(".ut-navigation-container-view--content").find(`#${idLog}`).remove();
-    $(".ut-navigation-container-view--content").append(logView());
+    const container = $(".ut-navigation-container-view--content");
+    container.find(`#${idLog}`).remove();
+    container.append(logView());
     initializeLog();
     updateSettingsView(getValue("CommonSettings") || {});
-  });
-  return `MagicBuyer `;
+  }, 0);
 };
