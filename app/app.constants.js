@@ -1,15 +1,6 @@
 export const MAX_CLUB_SEARCH = 90;
 export const MAX_MARKET_SEARCH = 20;
 
-export const AUTH_SESSION_DURATION = 60 * 60 * 1000;
-
-export const AUTH_API_BASE_URL =
-  (typeof window !== "undefined" && window.MAGIC_BUYER_AUTH_URL) ||
-  (typeof process !== "undefined" &&
-    process.env &&
-    process.env.MAGIC_BUYER_AUTH_URL) ||
-  "http://localhost:3001";
-
 export const STATE_ACTIVE = "Active";
 export const STATE_PAUSED = "Paused";
 export const STATE_STOPPED = "Stopped";

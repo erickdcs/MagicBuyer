@@ -2,7 +2,6 @@ import { idFilterDropdown, idLog } from "../elementIds.constants";
 import * as processors from "../handlers/autobuyerProcessor";
 import { statsProcessor } from "../handlers/statsProcessor";
 import { getValue, setValue } from "../services/repository";
-import { promptLoginIfNeeded } from "../services/auth/authClient";
 import { updateSettingsView } from "../utils/commonUtil";
 import { clearLogs } from "../utils/logUtil";
 import { createButton } from "./layouts/ButtonView";
@@ -29,16 +28,14 @@ JSUtils.inherits(
   UTMarketSearchFiltersViewController
 );
 
-const initializeAutoBuyerView = function () {
-  if (this.__magicBuyerInitialized) {
-    return;
-  }
+AutoBuyerViewController.prototype.init = function () {
+  searchFiltersViewInit.call(this);
+  let view = this.getView();
+  if (!isPhone()) view.__root.style = "width: 100%; float: left;";
+  setValue("AutoBuyerInstance", this);
 
-  this.__magicBuyerInitialized = true;
-
-  const view = this.getView();
   const menuItems = generateMenuItems.call(this);
-  const root = $(view.__root);
+  let root = $(view.__root);
   const createButtonWithContext = createButton.bind(this);
   const stopBtn = createButtonWithContext("Stop", () =>
     stopAutoBuyer.call(this)
@@ -83,26 +80,6 @@ const initializeAutoBuyerView = function () {
   root.find(".search-prices").append(menuItems.__root);
 };
 
-AutoBuyerViewController.prototype.init = function () {
-  searchFiltersViewInit.call(this);
-  const view = this.getView();
-  if (!isPhone()) {
-    view.__root.style = "width: 100%; float: left;";
-  }
-
-  setValue("AutoBuyerInstance", this);
-
-  promptLoginIfNeeded()
-    .then(() => {
-      initializeAutoBuyerView.call(this);
-    })
-    .catch((error) => {
-      /* eslint-disable no-console */
-      console.error("MagicBuyer authentication failed", error);
-      /* eslint-enable no-console */
-    });
-};
-
 AutoBuyerViewController.prototype.viewDidAppear = function () {
   this.getNavigationController().setNavigationVisibility(true, true);
   searchFiltersViewAppear.call(this, false);
@@ -130,21 +107,6 @@ AutoBuyerViewController.prototype.getNavigationTitle = function () {
     $(".view-navbar-currency").remove();
     $(".view-navbar-clubinfo").remove();
     title.append(BuyerStatus());
-    const authState = getValue("MagicBuyerAuthState");
-    const username =
-      authState && authState.user
-        ? authState.user.username ||
-          authState.user.email ||
-          authState.user.name ||
-          authState.user.id
-        : null;
-    if (username) {
-      const badge = document.createElement("span");
-      badge.className = "magicbuyer-header-username";
-      badge.textContent = ` | ${username}`;
-      const nativeTitle = title.get(0);
-      nativeTitle && nativeTitle.appendChild(badge);
-    }
     $(HeaderView()).insertAfter(title);
     $(".ut-navigation-container-view--content").find(`#${idLog}`).remove();
     $(".ut-navigation-container-view--content").append(logView());
