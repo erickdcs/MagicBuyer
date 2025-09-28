@@ -33,6 +33,11 @@
 
 ## Installation
 
+- **Browser extension build**
+  1. Install dependencies with `npm install`.
+  2. Run `npm run build:prod` to generate the bundled script and copy the extension assets into `dist/extension`.
+  3. In your browser's extension page enable developer mode and load the unpacked extension from the `dist/extension` folder (this directory contains the required `manifest.json`).
+
 - Add Tamper Monkey Extenstion to your Browser - [Link](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo?hl=en-GB).
 - Click on fut-auto-buyer.user.js from - [Latest Release](https://github.com/AMINE1921/MagicBuyer-UT/releases/).
 - Then click on Install/Update.

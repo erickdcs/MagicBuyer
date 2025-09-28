@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build:dev": "webpack --mode development",
-    "build:prod": "webpack --mode production",
-    "serve": "webpack serve --mode development",
+    "build:dev": "node scripts/build-extension.js && webpack --mode development",
+    "build:prod": "node scripts/build-extension.js && webpack --mode production",
+    "serve": "node scripts/build-extension.js && webpack serve --mode development",
     "build:mobile": "npx babel  dist/fut-auto-buyer.user.js --out-file dist/fut-auto-buyer.mobile.js --presets babel-preset-es2015"
   },
   "repository": {

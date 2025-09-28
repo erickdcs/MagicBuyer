@@ -1,6 +1,7 @@
 import { isMarketAlertApp } from "../app.constants";
 import { idSession } from "../elementIds.constants";
 import { setValue } from "../services/repository";
+import { sendExtensionRequest } from "../utils/extensionBridge";
 
 export const sendExternalRequest = async (options) => {
   if (isMarketAlertApp) {
@@ -19,10 +20,17 @@ const sendPhoneRequest = (options) => {
 };
 
 const sendWebRequest = (options) => {
-  GM_xmlhttpRequest({
+  sendExtensionRequest({
     method: options.method,
     url: options.url,
-    onload: options.onload,
     headers: { "User-Agent": idSession },
-  });
+  })
+    .then((response) => {
+      if (typeof options.onload === "function") {
+        options.onload(response);
+      }
+    })
+    .catch((error) => {
+      console.error("MagicBuyer extension request failed", error);
+    });
 };
