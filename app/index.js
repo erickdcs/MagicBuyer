@@ -2,7 +2,6 @@ import { isMarketAlertApp } from "./app.constants";
 import { initOverrides } from "./function-overrides";
 import { cssOverride } from "./function-overrides/css-override";
 import { initListeners } from "./services/listeners";
-import { ensureAuthenticated } from "./services/auth/loginManager";
 
 const initAutobuyer = function () {
   let isHomePageLoaded = false;
@@ -23,30 +22,15 @@ const initAutobuyer = function () {
   }
 };
 
-let initializationStarted = false;
-
 const initFunctionOverrides = function () {
   let isPageLoaded = false;
   if (services.Localization) {
     isPageLoaded = true;
   }
   if (isPageLoaded) {
-    if (initializationStarted) {
-      return;
-    }
-    initializationStarted = true;
-
-    ensureAuthenticated()
-      .then(() => {
-        initOverrides();
-        initAutobuyer();
-        isMarketAlertApp && initListeners();
-      })
-      .catch((error) => {
-        console.error("MagicBuyer authentication failed", error);
-        initializationStarted = false;
-        setTimeout(initFunctionOverrides, 3000);
-      });
+    initOverrides();
+    initAutobuyer();
+    isMarketAlertApp && initListeners();
   } else {
     setTimeout(initFunctionOverrides, 1000);
   }

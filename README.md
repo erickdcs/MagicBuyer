@@ -183,30 +183,6 @@ Now in Ultimate Team Web App, new menu will be added as AutoBuyer.
 
 - If enabled tool will gives sound notification for actions like buy card / captcha trigger etc...
 
-## Inicio de sesión obligatorio
-
-Antes de que el autobuyer se active, MagicBuyer mostrará ahora un formulario de inicio de sesión. Solo después de validar las credenciales frente a tu base de datos MySQL se cargarán las vistas y listeners del bot. Si la sesión caduca, el cuadro de diálogo volverá a mostrarse.
-
-Para que el formulario pueda conectar con tu base de datos necesitas exponer una configuración en tiempo de ejecución mediante la variable global `window.MAGICBUYER_AUTH_CONFIG` (también puedes almacenarla en Tampermonkey con `GM_setValue`). Un ejemplo básico sería:
-
-```js
-window.MAGICBUYER_AUTH_CONFIG = {
-  connection: {
-    host: "db-host",
-    user: "db-user",
-    password: "secret",
-    database: "magicbuyer",
-  },
-  options: {
-    tableName: "users",
-    usernameField: "email",
-    selectFields: ["id", "email", "role"],
-  },
-};
-```
-
-La vista recuerda la sesión durante seis horas por defecto y durante 24 horas si marcas la casilla **Recordarme**. Puedes forzar el cierre de sesión desde la consola del navegador ejecutando `window.MagicBuyerAuth?.clearSession()`.
-
 ## MySQL Login Verification Service
 
 The project now ships with a small authentication helper located at
