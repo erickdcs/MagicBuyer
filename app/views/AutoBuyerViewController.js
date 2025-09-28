@@ -99,6 +99,7 @@ const initializeAutoBuyerLayout = function () {
 
   this.__magicbuyerLayoutReady = true;
 
+
   const view = this.getView();
   if (!isPhone() && view && view.__root) {
     view.__root.style = "width: 100%; float: left;";
