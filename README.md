@@ -183,52 +183,33 @@ Now in Ultimate Team Web App, new menu will be added as AutoBuyer.
 
 - If enabled tool will gives sound notification for actions like buy card / captcha trigger etc...
 
-## MySQL Login Verification Service
+## Inicio de sesión obligatorio
 
-The project now ships with a small authentication helper located at
-`app/services/auth/mysqlAuthService.js`. The helper creates a login verifier
-that talks directly to a MySQL database using the [`mysql2`](https://www.npmjs.com/package/mysql2)
-driver. To use it, install the dependency in your Node.js environment and create
-the service with your database configuration:
+Antes de que el autobuyer se active, MagicBuyer mostrará ahora un formulario de inicio de sesión. Solo después de validar las credenciales frente a tu servicio de autenticación (el cual debe consultar tu base de datos) se cargarán las vistas y listeners del bot. Si la sesión caduca, el cuadro de diálogo volverá a mostrarse.
 
-```bash
-npm install mysql2
-# or
-yarn add mysql2
-```
+Para que el formulario pueda comunicarse con tu backend tienes que exponer en tiempo de ejecución la variable global `window.MAGICBUYER_AUTH_CONFIG` (también puedes almacenarla en Tampermonkey con `GM_setValue`). Un ejemplo básico sería:
 
 ```js
-import bcrypt from "bcrypt";
-import { createMySQLAuthService } from "./app/services/auth";
-
-const authService = createMySQLAuthService(
-  {
-    host: "db-host",
-    user: "db-user",
-    password: "secret",
-    database: "magicbuyer",
+window.MAGICBUYER_AUTH_CONFIG = {
+  endpoint: "https://tu-servidor.com/api/login",
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
   },
-  {
-    tableName: "users",
-    usernameField: "email",
-    selectFields: ["id", "email", "role"],
-    // Example: integrate bcrypt comparison logic if your passwords are hashed.
-    passwordComparator: async (inputPassword, storedHash) =>
-      bcrypt.compare(inputPassword, storedHash),
-  }
-);
-
-const result = await authService.login("user@example.com", "sup3rs3cret");
-if (result.success) {
-  console.log("Logged in!", result.user);
-} else {
-  console.error("Login failed", result.reason, result.error);
-}
+  successPath: "success", // Ruta en la respuesta JSON que indica éxito
+  userPath: "data.user", // Ruta con los datos del usuario autenticado
+  messagePath: "message", // Ruta opcional para mostrar mensajes de error
+  extraBody: {
+    clientId: "magicbuyer",
+  },
+  credentials: "include", // Incluye cookies si tu API utiliza sesiones
+  timeout: 10000, // Tiempo máximo (en ms) antes de cancelar la solicitud
+};
 ```
 
-When the credentials are valid, the returned object contains the non-sensitive
-fields requested via `selectFields`. On failure, a descriptive `reason` is
-provided (`USER_NOT_FOUND`, `INVALID_PASSWORD`, or `ERROR`).
+El endpoint debe encargarse de verificar las credenciales contra tu base de datos y devolver un JSON que indique si el acceso es válido. El overlay recuerda la sesión durante seis horas por defecto y durante 24 horas si marcas la casilla **Recordarme**. Puedes forzar el cierre de sesión desde la consola del navegador ejecutando `window.MagicBuyerAuth?.clearSession()`.
+
+Si deseas reutilizar la misma lógica en otro entorno, puedes importar el helper `createApiAuthService` ubicado en `app/services/auth/apiAuthService.js`. Este helper envía las credenciales a tu API y expone un método `login` que resuelve con el resultado normalizado.
 
 ## Prerequisites
 

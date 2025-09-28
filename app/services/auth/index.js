@@ -1,4 +1,12 @@
-import { createMySQLAuthService } from "./mysqlAuthService";
+import { ensureAuthenticated, clearStoredSession } from "./loginManager";
+import { resolveAuthConfig, getConfigGlobalKey } from "./configResolver";
+import { createApiAuthService } from "./apiAuthService";
 
-export { createMySQLAuthService };
+export {
+  createApiAuthService,
+  ensureAuthenticated,
+  clearStoredSession,
+  resolveAuthConfig,
+  getConfigGlobalKey,
+};
 

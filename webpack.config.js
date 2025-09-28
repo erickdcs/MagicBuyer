@@ -1,5 +1,9 @@
 const headers = require("./tampermonkey-header");
-const WebpackUserscript = require("webpack-userscript");
+const WebpackUserscriptModule = require("webpack-userscript");
+const WebpackUserscript =
+  WebpackUserscriptModule && WebpackUserscriptModule.default
+    ? WebpackUserscriptModule.default
+    : WebpackUserscriptModule;
 const TerserPlugin = require("terser-webpack-plugin");
 
 module.exports = {
