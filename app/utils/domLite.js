@@ -357,6 +357,7 @@ class DollarCollection {
     });
   }
 
+
   prepend(content) {
     const nodes = toNodes(content);
     if (!nodes.length) {
