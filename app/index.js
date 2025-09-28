@@ -1,10 +1,7 @@
-import $ from "./utils/domLite";
 import { isMarketAlertApp } from "./app.constants";
 import { initOverrides } from "./function-overrides";
 import { cssOverride } from "./function-overrides/css-override";
 import { initListeners } from "./services/listeners";
-
-window.$ = window.jQuery = $;
 
 const initAutobuyer = function () {
   let isHomePageLoaded = false;

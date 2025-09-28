@@ -1,7 +1,5 @@
-import { sendExtensionRequest } from "../utils/extensionBridge";
-
 const defaultFetch = window.fetch;
-window.fetch = function (request, options = {}) {
+window.fetch = function (request, options) {
   if (
     request &&
     (/discordapp/.test(request) || /exp.host/.test(request)) &&
@@ -11,34 +9,28 @@ window.fetch = function (request, options = {}) {
       const headers = Object.assign({}, options.headers, {
         "User-Agent": "From Node",
       });
-
-      sendExtensionRequest({
+      GM_xmlhttpRequest({
         method: options.method,
         headers,
         url: request,
         data: options.body,
-      })
-        .then((res) => {
+        onload: (res) => {
           if (res.status === 200 || res.status === 204) {
-            res.text = () => Promise.resolve(res.responseText);
-            if (!res.headers || !(res.headers instanceof Map)) {
-              res.headers = res.responseHeaders
-                .split("\r\n")
-                .filter(Boolean)
-                .reduce((acc, current) => {
-                  const [name, ...valueParts] = current.split(": ");
-                  if (name) {
-                    acc.set(name, valueParts.join(": "));
-                  }
-                  return acc;
-                }, new Map());
-            }
+            res.text = () =>
+              new Promise((resolve) => resolve(res.responseText));
+            res.headers = res.responseHeaders
+              .split("\r\n")
+              .reduce(function (acc, current) {
+                var parts = current.split(": ");
+                acc.set(parts[0], parts[1]);
+                return acc;
+              }, new Map());
             resolve(res);
           } else {
             reject(res);
           }
-        })
-        .catch(reject);
+        },
+      });
     });
   }
   const response = defaultFetch.call(this, request, options);
