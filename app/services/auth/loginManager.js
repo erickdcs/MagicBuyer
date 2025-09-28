@@ -1,5 +1,6 @@
 import { setValue, getValue } from "../repository";
 import { createApiAuthService } from "./apiAuthService";
+
 import { resolveAuthConfig } from "./configResolver";
 import { renderLoginOverlay } from "../../views/layouts/LoginView";
 
@@ -14,6 +15,7 @@ const getAuthService = () => {
   if (!authServiceInstance) {
     const config = resolveAuthConfig();
     authServiceInstance = createApiAuthService(config);
+
   }
   return authServiceInstance;
 };
@@ -44,6 +46,7 @@ const describeFailure = (result) => {
       return "La respuesta del servidor de autenticación no es válida.";
     default:
       return "No se pudo validar las credenciales.";
+
   }
 };
 

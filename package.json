@@ -15,6 +15,9 @@
   },
   "author": "AMINE1921",
   "license": "ISC",
+  "dependencies": {
+    "mysql2": "^3.9.6"
+  },
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-preset-es2015": "^6.24.1",

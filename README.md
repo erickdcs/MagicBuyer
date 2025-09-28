@@ -189,6 +189,7 @@ Antes de que el autobuyer se active, MagicBuyer mostrará ahora un formulario de
 
 Para que el formulario pueda comunicarse con tu backend tienes que exponer en tiempo de ejecución la variable global `window.MAGICBUYER_AUTH_CONFIG` (también puedes almacenarla en Tampermonkey con `GM_setValue`). Un ejemplo básico sería:
 
+
 ```js
 window.MAGICBUYER_AUTH_CONFIG = {
   endpoint: "https://tu-servidor.com/api/login",

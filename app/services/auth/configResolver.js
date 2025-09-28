@@ -75,6 +75,7 @@ export const resolveAuthConfig = () => {
     responseType,
     timeout,
   };
+
 };
 
 export const getConfigGlobalKey = () => CONFIG_GLOBAL_KEY;
