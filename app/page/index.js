@@ -1,5 +1,5 @@
 // app/page/index.js
-
+import "../vendor/jquery";
 // 🔽 IMPORTA TUS VISTAS/LAYOUTS DEL DEV
 import { idLog, idFilterDropdown } from "../elementIds.constants";
 import * as processors from "../handlers/autobuyerProcessor";
