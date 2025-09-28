@@ -36,21 +36,40 @@ JSUtils.inherits(
 AutoBuyerViewController.prototype.init = function () {
   searchFiltersViewInit.call(this);
   setValue("AutoBuyerInstance", this);
-
-  requireAuthentication()
-    .then(() => {
-      initializeAutoBuyerLayout.call(this);
-    })
-    .catch((error) => {
-      /* eslint-disable no-console */
-      console.error("No se pudo completar la autenticación de MagicBuyer", error);
-      /* eslint-enable no-console */
-    });
+  this.__magicbuyerLayoutReady = false;
+  this.__magicbuyerAuthPromise = null;
 };
 
 AutoBuyerViewController.prototype.viewDidAppear = function () {
   this.getNavigationController().setNavigationVisibility(true, true);
   searchFiltersViewAppear.call(this, false);
+
+  if (this.__magicbuyerLayoutReady) {
+    decorateNavigationAfterLogin();
+    return;
+  }
+
+  if (isAuthenticated()) {
+    initializeAutoBuyerLayout.call(this);
+    return;
+  }
+
+  if (!this.__magicbuyerAuthPromise) {
+    this.__magicbuyerAuthPromise = requireAuthentication()
+      .then(() => {
+        this.__magicbuyerAuthPromise = null;
+        initializeAutoBuyerLayout.call(this);
+      })
+      .catch((error) => {
+        this.__magicbuyerAuthPromise = null;
+        /* eslint-disable no-console */
+        console.error(
+          "No se pudo completar la autenticación de MagicBuyer",
+          error
+        );
+        /* eslint-enable no-console */
+      });
+  }
 };
 
 UTMarketSearchFiltersViewController.prototype.viewDidAppear = function () {
@@ -73,6 +92,14 @@ AutoBuyerViewController.prototype.getNavigationTitle = function () {
 };
 
 const initializeAutoBuyerLayout = function () {
+  if (this.__magicbuyerLayoutReady) {
+    decorateNavigationAfterLogin();
+    return;
+  }
+
+  this.__magicbuyerLayoutReady = true;
+
+
   const view = this.getView();
   if (!isPhone() && view && view.__root) {
     view.__root.style = "width: 100%; float: left;";
