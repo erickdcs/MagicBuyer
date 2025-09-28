@@ -183,6 +183,79 @@ Now in Ultimate Team Web App, new menu will be added as AutoBuyer.
 
 - If enabled tool will gives sound notification for actions like buy card / captcha trigger etc...
 
+## Mandatory Authentication Flow
+
+MagicBuyer now requires a successful login before the autobuyer interface can
+be used. When the view is opened a modal dialog requests the user's credentials
+and blocks the UI until the authentication succeeds. Credentials are validated
+against a dedicated REST endpoint backed by a MySQL database.
+
+### Authentication server
+
+The repository ships with a lightweight Express server located at
+`server/index.js`. The server expects a `users` table (the default table name
+is configurable) containing at least a username and password column. Passwords
+stored with bcrypt hashes are supported out-of-the-box; plain text passwords
+are also accepted, although not recommended.
+
+1. Install the runtime dependencies if they are not present in your
+   environment:
+
+   ```bash
+   npm install express cors mysql2 bcryptjs
+   ```
+
+2. Configure the connection details by exporting environment variables (or via
+   a `.env` file loaded by your process manager):
+
+   ```bash
+   export MB_DB_HOST=localhost
+   export MB_DB_PORT=3306
+   export MB_DB_USER=magicbuyer
+   export MB_DB_PASSWORD=supersecret
+   export MB_DB_NAME=magicbuyer
+   export MB_AUTH_ALLOWED_ORIGINS="https://www.ea.com"
+   export MB_AUTH_PORT=3001
+   ```
+
+   Optional variables include `MB_AUTH_TABLE`, `MB_AUTH_USERNAME_FIELD`,
+   `MB_AUTH_PASSWORD_FIELD`, and `MB_AUTH_SESSION_TTL` (in seconds). The server
+   listens on `MB_AUTH_PORT` (defaults to `3001`).
+
+3. Start the server with:
+
+   ```bash
+   npm run auth:server
+   ```
+
+   An example schema compatible with the defaults:
+
+   ```sql
+   CREATE TABLE users (
+     id INT AUTO_INCREMENT PRIMARY KEY,
+     username VARCHAR(255) NOT NULL UNIQUE,
+     password VARCHAR(255) NOT NULL
+   );
+   ```
+
+### Client configuration
+
+The userscript reads the authentication endpoint from the global variable
+`window.MAGIC_BUYER_AUTH_URL`. If the variable is not defined the default value
+`http://localhost:3001` is used. Set the global before MagicBuyer loads (for
+example adding a small boot script in Tampermonkey):
+
+```js
+// ==UserScript==
+// @run-at document-start
+// ==/UserScript==
+window.MAGIC_BUYER_AUTH_URL = "http://127.0.0.1:3001";
+```
+
+Successful logins are cached for one hour (configurable through the
+`AUTH_SESSION_DURATION` constant) and the authenticated username is displayed
+next to the MagicBuyer header.
+
 ## MySQL Login Verification Service
 
 The project now ships with a small authentication helper located at
