@@ -191,3 +191,13 @@ window.addEventListener("message", (event) => {
       .catch((e) => console.error("[MagicBuyer] openSettings error:", e));
   }
 });
+
+// Notifica al content script que el bundle de página está listo para recibir comandos
+if (!window.__mbPageReadyNotified) {
+  window.__mbPageReadyNotified = true;
+  try {
+    window.postMessage({ type: "MAGIC_BUYER_PAGE_READY" }, "*");
+  } catch (e) {
+    console.error("[MagicBuyer] Failed to dispatch PAGE_READY event:", e);
+  }
+}
