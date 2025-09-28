@@ -270,6 +270,101 @@ export const cssOverride = () => {
   .auto-buyer .search-prices .settings-field{
     display: none;
   }
+  .magicbuyer-login-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(7, 9, 18, 0.85);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    backdrop-filter: blur(2px);
+  }
+  .magicbuyer-login-card {
+    background: #1a2233;
+    border: 1px solid #4ee6eb;
+    border-radius: 12px;
+    padding: 24px;
+    max-width: 360px;
+    width: 100%;
+    font-family: UltimateTeam, sans-serif;
+    color: #f2f2f2;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+  }
+  .magicbuyer-login-card h2 {
+    margin: 0 0 16px 0;
+    text-align: center;
+    font-size: 1.4em;
+    color: #e8f5ff;
+  }
+  .magicbuyer-login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .magicbuyer-login-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 0.95em;
+    color: #c8d6e5;
+  }
+  .magicbuyer-login-field input {
+    background: #0f1724;
+    border: 1px solid #4ee6eb;
+    color: #ffffff;
+    padding: 10px;
+    border-radius: 6px;
+  }
+  .magicbuyer-login-form button {
+    background: linear-gradient(120deg, #4ee6eb, #4c6ef5);
+    border: none;
+    border-radius: 6px;
+    color: #0b1320;
+    cursor: pointer;
+    font-weight: bold;
+    padding: 10px;
+    text-transform: uppercase;
+    transition: filter 0.2s ease;
+  }
+  .magicbuyer-login-form button:hover:not(:disabled) {
+    filter: brightness(1.05);
+  }
+  .magicbuyer-login-form button:disabled,
+  .magicbuyer-login-form button.is-loading {
+    cursor: wait;
+    filter: grayscale(0.4);
+    opacity: 0.7;
+  }
+  .magicbuyer-login-status {
+    min-height: 18px;
+    font-size: 0.9em;
+    text-align: center;
+    color: #c8d6e5;
+  }
+  .magicbuyer-login-error {
+    color: #ff6b6b;
+  }
+  .magicbuyer-login-success {
+    color: #4df59b;
+  }
+  .magicbuyer-login-footer {
+    text-align: center;
+    font-size: 0.85em;
+    margin-top: 18px;
+    color: #a5b1c2;
+  }
+  .magicbuyer-user-badge {
+    margin-left: 12px;
+    font-size: 0.8em;
+    color: #4ee6eb;
+    background: rgba(76, 110, 245, 0.18);
+    padding: 4px 8px;
+    border-radius: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
   `;
   style.innerText += getScrollBarStyle();
   document.head.appendChild(style);
