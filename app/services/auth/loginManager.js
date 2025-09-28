@@ -1,6 +1,5 @@
 import { setValue, getValue } from "../repository";
-import { createApiAuthService } from "./apiAuthService";
-
+import { createMySQLAuthService } from "./mysqlAuthService";
 import { resolveAuthConfig } from "./configResolver";
 import { renderLoginOverlay } from "../../views/layouts/LoginView";
 
@@ -13,9 +12,8 @@ let loginPromise;
 
 const getAuthService = () => {
   if (!authServiceInstance) {
-    const config = resolveAuthConfig();
-    authServiceInstance = createApiAuthService(config);
-
+    const { connection, options } = resolveAuthConfig();
+    authServiceInstance = createMySQLAuthService(connection, options);
   }
   return authServiceInstance;
 };
@@ -29,24 +27,16 @@ const persistSession = (session, remember) => {
 };
 
 const describeFailure = (result) => {
-  if (!result) {
-    return "No se pudo validar las credenciales.";
-  }
-
-  if (result.message) {
-    return result.message;
-  }
-
   switch (result.reason) {
-    case "TIMEOUT":
-      return "La solicitud de autenticación tardó demasiado.";
-    case "NETWORK_ERROR":
-      return "No se pudo contactar con el servidor de autenticación.";
-    case "INVALID_RESPONSE":
-      return "La respuesta del servidor de autenticación no es válida.";
+    case "USER_NOT_FOUND":
+      return "El usuario no existe.";
+    case "INVALID_PASSWORD":
+      return "La contraseña no es válida.";
+    case "ERROR":
     default:
-      return "No se pudo validar las credenciales.";
-
+      return result.error
+        ? `Error al validar las credenciales: ${result.error}`
+        : "No se pudo validar las credenciales.";
   }
 };
 

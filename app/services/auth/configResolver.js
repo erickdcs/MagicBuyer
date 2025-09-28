@@ -35,47 +35,19 @@ export const resolveAuthConfig = () => {
   const runtimeConfig = getRuntimeConfig();
   if (!runtimeConfig || typeof runtimeConfig !== "object") {
     throw new Error(
-      "No se encontró la configuración de autenticación. Define `window.MAGICBUYER_AUTH_CONFIG` con el endpoint del servicio de login."
+      "No se encontró la configuración de autenticación. Define `window.MAGICBUYER_AUTH_CONFIG` con los datos de conexión MySQL."
     );
   }
 
-  const { endpoint } = runtimeConfig;
+  const { connection, options = {} } = runtimeConfig;
 
-  if (!endpoint || typeof endpoint !== "string") {
+  if (!connection || typeof connection !== "object") {
     throw new Error(
-      "La configuración de autenticación debe incluir una propiedad `endpoint` con la URL del servicio." 
+      "La configuración de autenticación debe incluir un objeto `connection` válido."
     );
   }
 
-  const {
-    method,
-    headers,
-    successPath,
-    userPath,
-    messagePath,
-    tokenPath,
-    extraBody,
-    credentials,
-    mode,
-    responseType,
-    timeout,
-  } = runtimeConfig;
-
-  return {
-    endpoint,
-    method,
-    headers,
-    successPath,
-    userPath,
-    messagePath,
-    tokenPath,
-    extraBody,
-    credentials,
-    mode,
-    responseType,
-    timeout,
-  };
-
+  return { connection, options };
 };
 
 export const getConfigGlobalKey = () => CONFIG_GLOBAL_KEY;
