@@ -1,3 +1,5 @@
+/* global ko */
+
 import { defaultBuyerSetting, defaultCommonSetting } from "../app.constants";
 import * as ElementIds from "../elementIds.constants";
 import { getValue, getBuyerSettings, setValue } from "../services/repository";
@@ -10,7 +12,44 @@ import { deleteFilters, insertFilters } from "./dbUtil";
 import { checkAndAppendOption, updateMultiFilterSettings } from "./filterUtil";
 import { sendUINotification } from "./notificationUtil";
 
+const tryUnwrapObservable = (value) => {
+  if (typeof value !== "function") {
+    return undefined;
+  }
+
+  try {
+    if (
+      typeof ko !== "undefined" &&
+      ko &&
+      typeof ko.isObservable === "function" &&
+      ko.isObservable(value)
+    ) {
+      return value();
+    }
+  } catch (err) {
+    // fall through to additional heuristics when Knockout is not available
+  }
+
+  if ("__ko_proto__" in value || typeof value.peek === "function") {
+    try {
+      return value();
+    } catch (err) {
+      return undefined;
+    }
+  }
+
+  return undefined;
+};
+
 const sanitizeForStorage = (value, seen = new WeakMap()) => {
+  if (typeof value === "function") {
+    const unwrapped = tryUnwrapObservable(value);
+    if (unwrapped === undefined) {
+      return undefined;
+    }
+    return sanitizeForStorage(unwrapped, seen);
+  }
+
   if (value === null || typeof value !== "object") {
     return value;
   }
