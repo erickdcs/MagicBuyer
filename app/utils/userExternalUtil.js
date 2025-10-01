@@ -1,3 +1,5 @@
+/* global ko */
+
 import { defaultBuyerSetting, defaultCommonSetting } from "../app.constants";
 import * as ElementIds from "../elementIds.constants";
 import { getValue, getBuyerSettings, setValue } from "../services/repository";
@@ -73,6 +75,7 @@ const cloneForStorage = (value, fallbackValue) => {
   } catch (err) {
     return fallbackValue;
   }
+
 };
 
 const createFilterSnapshot = (viewModel, buyerSetting) => {
