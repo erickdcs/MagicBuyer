@@ -2,11 +2,12 @@ import {
   idAbFiltersToUpload,
   idAbFiltersFileToUpload,
 } from "../elementIds.constants";
-import { getValue } from "../services/repository";
+import { getValue, setValue } from "../services/repository";
 import { downloadJson } from "./commonUtil";
 import { showPopUp } from "./popupUtil";
 import { saveFilterInDB } from "./userExternalUtil";
 import { sendUINotification } from "./notificationUtil";
+import { insertFilters } from "./dbUtil";
 
 $(document).on(
   {
@@ -19,6 +20,11 @@ $(document).on(
 
 export const downloadFilters = () => {
   const userFilters = getValue("filters");
+
+  if (!userFilters || !Object.keys(userFilters).length) {
+    sendUINotification("No filters available to download", UINotificationType.NEGATIVE);
+    return;
+  }
 
   let filterMessage = `Choose filters to Download <br /> <br />
   <select  multiple="multiple" class="multiselect-filter filter-header-settings" id="${idAbFiltersToUpload}"
@@ -93,6 +99,15 @@ const uploadFilterConfirm = () => {
 
     for (let filter in parsedFilters.filters) {
       saveFilterInDB(filter, parsedFilters.filters[filter]);
+    }
+
+    if (parsedFilters.commonSettings) {
+      insertFilters(
+        "CommonSettings",
+        JSON.stringify(parsedFilters.commonSettings),
+        "CommonSettings"
+      );
+      setValue("CommonSettings", parsedFilters.commonSettings);
     }
     sendUINotification("Filters uploaded successfully");
   };

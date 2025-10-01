@@ -138,6 +138,9 @@ export const cssOverride = () => {
   .btn-delete-filter {
     width:50%
   }
+  .btn-download-filter {
+    width:50%
+  }
   .multiple-filter {
     width: 100%  !important;
     display: flex  !important;
