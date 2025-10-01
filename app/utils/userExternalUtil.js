@@ -73,8 +73,10 @@ export const saveFilterInDB = (filterName, settingsJson) => {
   checkAndAppendOption(filterDropdownId, filterName);
   checkAndAppendOption(`#${ElementIds.idSelectedFilter}`, filterName);
   $(`${filterDropdownId} option[value="${filterName}"]`).attr("selected", true);
-  getValue("filters")[filterName] = JSON.stringify(settingsJson);
-  insertFilters(filterName, getValue("filters")[filterName]);
+  const filters = getValue("filters") || {};
+  filters[filterName] = JSON.stringify(settingsJson);
+  setValue("filters", filters);
+  insertFilters(filterName, filters[filterName]);
 };
 
 const loadDefaultFilter = () => {
