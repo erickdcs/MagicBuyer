@@ -12,51 +12,137 @@ import { deleteFilters, insertFilters } from "./dbUtil";
 import { checkAndAppendOption, updateMultiFilterSettings } from "./filterUtil";
 import { sendUINotification } from "./notificationUtil";
 
-const safeSerialize = (value) => {
-  const seen = new WeakSet();
+const sanitizeForJson = (value, seen = new WeakMap()) => {
+  if (value === null || value === undefined) {
+    return value;
+  }
 
-  return JSON.stringify(value, function (key, currentValue) {
-    if (typeof currentValue === "function") {
-      return undefined;
+  const valueType = typeof value;
+
+  if (valueType === "function") {
+    return undefined;
+  }
+
+  if (valueType === "bigint") {
+    return Number(value);
+  }
+
+  if (valueType !== "object") {
+    return value;
+  }
+
+  if (value.nodeType && typeof value.cloneNode === "function") {
+    return undefined;
+  }
+
+  if (seen.has(value)) {
+    return seen.get(value);
+  }
+
+  if (value instanceof Date) {
+    return value.toISOString();
+  }
+
+  if (value instanceof WeakMap || value instanceof WeakSet) {
+    return undefined;
+  }
+
+  if (value instanceof Map) {
+    const mapResult = {};
+    seen.set(value, mapResult);
+    value.forEach((mapValue, mapKey) => {
+      const sanitizedValue = sanitizeForJson(mapValue, seen);
+      if (sanitizedValue !== undefined) {
+        mapResult[mapKey] = sanitizedValue;
+      }
+    });
+    return mapResult;
+  }
+
+  if (value instanceof Set) {
+    const setResult = [];
+    seen.set(value, setResult);
+    value.forEach((setValue) => {
+      const sanitizedValue = sanitizeForJson(setValue, seen);
+      if (sanitizedValue !== undefined) {
+        setResult.push(sanitizedValue);
+      }
+    });
+    return setResult;
+  }
+
+  if (Array.isArray(value)) {
+    const arrayResult = [];
+    seen.set(value, arrayResult);
+    value.forEach((item, index) => {
+      arrayResult[index] = sanitizeForJson(item, seen);
+    });
+    return arrayResult;
+  }
+
+  if (typeof value.toJSON === "function") {
+    try {
+      const jsonValue = value.toJSON();
+      return sanitizeForJson(jsonValue, seen);
+    } catch (err) {
+      // If toJSON fails, continue with manual extraction below.
+    }
+  }
+
+  if (typeof value.clone === "function") {
+    try {
+      const clonedValue = value.clone();
+      return sanitizeForJson(clonedValue, seen);
+    } catch (err) {
+      // Ignore clone errors and fall back to manual extraction.
+    }
+  }
+
+  const result = {};
+  seen.set(value, result);
+
+  const keys = new Set([
+    ...Reflect.ownKeys(value).filter((key) => typeof key === "string"),
+    ...Object.keys(value),
+  ]);
+
+  keys.forEach((key) => {
+    let descriptor;
+    try {
+      descriptor = Object.getOwnPropertyDescriptor(value, key);
+    } catch (err) {
+      descriptor = undefined;
     }
 
-    if (typeof currentValue === "bigint") {
-      return Number(currentValue);
+    if (descriptor && descriptor.get && !descriptor.set && !descriptor.value) {
+      let getterValue;
+      try {
+        getterValue = value[key];
+      } catch (err) {
+        return;
+      }
+      const sanitizedValue = sanitizeForJson(getterValue, seen);
+      if (sanitizedValue !== undefined) {
+        result[key] = sanitizedValue;
+      }
+      return;
     }
 
-    if (currentValue && typeof currentValue === "object") {
-      if (currentValue.nodeType && typeof currentValue.cloneNode === "function") {
-        return undefined;
-      }
-
-      if (currentValue instanceof Map) {
-        if (seen.has(currentValue)) {
-          return undefined;
-        }
-        seen.add(currentValue);
-        const mapResult = {};
-        currentValue.forEach((mapValue, mapKey) => {
-          mapResult[mapKey] = mapValue;
-        });
-        return mapResult;
-      }
-
-      if (currentValue instanceof Set) {
-        if (seen.has(currentValue)) {
-          return undefined;
-        }
-        seen.add(currentValue);
-        return Array.from(currentValue.values());
-      }
-
-      if (seen.has(currentValue)) {
-        return undefined;
-      }
-      seen.add(currentValue);
+    let currentValue;
+    try {
+      currentValue = value[key];
+    } catch (err) {
+      return;
     }
 
-    return currentValue;
+    const sanitizedValue = sanitizeForJson(currentValue, seen);
+    if (sanitizedValue !== undefined) {
+      result[key] = sanitizedValue;
+    }
   });
+
+  return result;
+
 };
 
 const cloneForStorage = (value, fallbackValue) => {
@@ -65,17 +151,16 @@ const cloneForStorage = (value, fallbackValue) => {
   }
 
   try {
-    const serialized = safeSerialize(value);
+    const sanitized = sanitizeForJson(value);
 
-    if (typeof serialized !== "string") {
+    if (sanitized === undefined) {
       return fallbackValue;
     }
 
-    return JSON.parse(serialized);
+    return JSON.parse(JSON.stringify(sanitized));
   } catch (err) {
     return fallbackValue;
   }
-
 };
 
 const createFilterSnapshot = (viewModel, buyerSetting) => {
