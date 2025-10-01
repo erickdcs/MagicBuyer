@@ -20,6 +20,7 @@ import {
   deleteFilter,
   loadFilter,
   saveFilterDetails,
+  downloadCurrentFilter,
 } from "../../../utils/userExternalUtil";
 import { createButton } from "../ButtonView";
 import { showPopUp } from "../../../utils/popupUtil";
@@ -247,6 +248,15 @@ const appendButtons = function (rootHeader, context) {
         saveFilterDetails.call(this, context);
       },
       "call-to-action btn-save-filter"
+    ).__root
+  );
+  buttons.append(
+    createButton(
+      "Download Current",
+      function () {
+        downloadCurrentFilter.call(this, context);
+      },
+      "call-to-action btn-download-filter"
     ).__root
   );
   btnReport.append(
