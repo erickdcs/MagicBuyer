@@ -12,37 +12,6 @@ import { deleteFilters, insertFilters } from "./dbUtil";
 import { checkAndAppendOption, updateMultiFilterSettings } from "./filterUtil";
 import { sendUINotification } from "./notificationUtil";
 
-const collectSerializableKeys = (value) => {
-  const keys = new Set();
-  let current = value;
-
-  while (current && current !== Object.prototype) {
-    try {
-      Reflect.ownKeys(current)
-        .filter((key) => typeof key === "string")
-        .forEach((key) => keys.add(key));
-    } catch (err) {
-      // Ignore prototype traversal errors (e.g. revoked proxies).
-    }
-
-    let nextPrototype;
-    try {
-      nextPrototype = Object.getPrototypeOf(current);
-    } catch (err) {
-      break;
-    }
-
-    if (!nextPrototype || nextPrototype === current) {
-      break;
-    }
-
-    current = nextPrototype;
-  }
-
-  return keys;
-};
-
-
 const sanitizeForJson = (value, seen = new WeakMap()) => {
   if (value === null || value === undefined) {
     return value;
@@ -132,8 +101,10 @@ const sanitizeForJson = (value, seen = new WeakMap()) => {
   const result = {};
   seen.set(value, result);
 
-  const keys = collectSerializableKeys(value);
-
+  const keys = new Set([
+    ...Reflect.ownKeys(value).filter((key) => typeof key === "string"),
+    ...Object.keys(value),
+  ]);
 
   keys.forEach((key) => {
     let descriptor;
