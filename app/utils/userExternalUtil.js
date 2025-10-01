@@ -1,3 +1,5 @@
+/* global ko */
+
 import { defaultBuyerSetting, defaultCommonSetting } from "../app.constants";
 import * as ElementIds from "../elementIds.constants";
 import { getValue, getBuyerSettings, setValue } from "../services/repository";
@@ -5,10 +7,128 @@ import {
   clearSettingMenus,
   updateCommonSettings,
 } from "../views/layouts/MenuItemView";
-import { updateSettingsView } from "./commonUtil";
+import { updateSettingsView, downloadJson } from "./commonUtil";
 import { deleteFilters, insertFilters } from "./dbUtil";
 import { checkAndAppendOption, updateMultiFilterSettings } from "./filterUtil";
 import { sendUINotification } from "./notificationUtil";
+
+const tryUnwrapObservable = (value) => {
+  if (typeof value !== "function") {
+    return undefined;
+  }
+
+  try {
+    if (
+      typeof ko !== "undefined" &&
+      ko &&
+      typeof ko.isObservable === "function" &&
+      ko.isObservable(value)
+    ) {
+      return value();
+    }
+  } catch (err) {
+    // fall through to additional heuristics when Knockout is not available
+  }
+
+  if ("__ko_proto__" in value || typeof value.peek === "function") {
+    try {
+      return value();
+    } catch (err) {
+      return undefined;
+    }
+  }
+
+  return undefined;
+};
+
+const sanitizeForStorage = (value, seen = new WeakMap()) => {
+  if (typeof value === "function") {
+    const unwrapped = tryUnwrapObservable(value);
+    if (unwrapped === undefined) {
+      return undefined;
+    }
+    return sanitizeForStorage(unwrapped, seen);
+  }
+
+  if (value === null || typeof value !== "object") {
+    return value;
+  }
+
+  if (seen.has(value)) {
+    return seen.get(value);
+  }
+
+  if (value instanceof Date) {
+    return value.toISOString();
+  }
+
+  if (value instanceof Map) {
+    const mapResult = {};
+    seen.set(value, mapResult);
+    value.forEach((mapValue, key) => {
+      mapResult[key] = sanitizeForStorage(mapValue, seen);
+    });
+    return mapResult;
+  }
+
+  if (value instanceof Set) {
+    const setResult = [];
+    seen.set(value, setResult);
+    value.forEach((setValue) => {
+      setResult.push(sanitizeForStorage(setValue, seen));
+    });
+    return setResult;
+  }
+
+  if (Array.isArray(value)) {
+    const arr = [];
+    seen.set(value, arr);
+    value.forEach((item) => {
+      arr.push(sanitizeForStorage(item, seen));
+    });
+    return arr;
+  }
+
+  if (value.nodeType && typeof value.cloneNode === "function") {
+    return undefined;
+  }
+
+  const sanitizedObject = {};
+  seen.set(value, sanitizedObject);
+
+  Object.keys(value).forEach((key) => {
+    const currentValue = value[key];
+    if (typeof currentValue === "function") {
+      return;
+    }
+    const sanitizedValue = sanitizeForStorage(currentValue, seen);
+    if (sanitizedValue !== undefined) {
+      sanitizedObject[key] = sanitizedValue;
+    }
+  });
+
+  return sanitizedObject;
+};
+
+const createFilterSnapshot = (viewModel, buyerSetting) => {
+  const criteria = viewModel?.searchCriteria
+    ? sanitizeForStorage(viewModel.searchCriteria)
+    : {};
+  const playerData = viewModel?.playerData
+    ? sanitizeForStorage(viewModel.playerData)
+    : null;
+  const buyerSettings = buyerSetting
+    ? sanitizeForStorage(buyerSetting)
+    : {};
+
+  return {
+    searchCriteria: {
+      criteria,
+      playerData,
+      buyerSettings,
+    },
+  };
+};
 
 const validateSettings = () => {
   if (document.querySelectorAll(":invalid").length) {
@@ -28,13 +148,8 @@ export const saveFilterDetails = function (self) {
   let buyerSetting = getBuyerSettings(true);
   let commonSettings = getValue("CommonSettings");
   setTimeout(function () {
-    let settingsJson = {};
     const viewModel = self._viewmodel;
-    settingsJson.searchCriteria = {
-      criteria: viewModel.searchCriteria,
-      playerData: viewModel.playerData,
-      buyerSettings: buyerSetting,
-    };
+    const settingsJson = createFilterSnapshot(viewModel, buyerSetting);
 
     let currentFilterName = $(`${filterDropdownId} option`)
       .filter(":selected")
@@ -65,6 +180,55 @@ export const saveFilterDetails = function (self) {
       $(btnContext).removeClass("active");
       sendUINotification("Filter Name Required", UINotificationType.NEGATIVE);
     }
+  }, 200);
+};
+
+export const downloadCurrentFilter = function (self) {
+  const btnContext = this;
+  $(btnContext).addClass("active");
+  setTimeout(function () {
+    const buyerSetting = getBuyerSettings(true);
+    const viewModel = self._viewmodel;
+    const currentFilter = getValue("currentFilter") || "CURRENT_FILTER";
+    let filterName = prompt(
+      "Enter a name for the exported filter",
+      currentFilter
+    );
+
+    if (!filterName) {
+      $(btnContext).removeClass("active");
+      sendUINotification("Filter Name Required", UINotificationType.NEGATIVE);
+      return;
+    }
+
+    filterName = filterName.trim();
+
+    if (!filterName.length) {
+      $(btnContext).removeClass("active");
+      sendUINotification("Filter Name Required", UINotificationType.NEGATIVE);
+      return;
+    }
+
+    const sanitizedFilterName = filterName.toUpperCase();
+    const downloadFileName = `${filterName
+      .replace(/\s+/g, "_")
+      .toLowerCase()}_filter`;
+
+    const settingsJson = createFilterSnapshot(viewModel, buyerSetting);
+    const downloadPayload = {
+      filters: {
+        [sanitizedFilterName]: settingsJson,
+      },
+    };
+
+    const commonSettings = getValue("CommonSettings");
+    if (commonSettings) {
+      downloadPayload.commonSettings = sanitizeForStorage(commonSettings);
+    }
+
+    downloadJson(downloadPayload, downloadFileName);
+    $(btnContext).removeClass("active");
+    sendUINotification("Filter downloaded successfully");
   }, 200);
 };
 
