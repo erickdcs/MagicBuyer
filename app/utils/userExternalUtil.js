@@ -12,113 +12,82 @@ import { deleteFilters, insertFilters } from "./dbUtil";
 import { checkAndAppendOption, updateMultiFilterSettings } from "./filterUtil";
 import { sendUINotification } from "./notificationUtil";
 
-const tryUnwrapObservable = (value) => {
-  if (typeof value !== "function") {
-    return undefined;
+const safeSerialize = (value) => {
+  const seen = new WeakSet();
+
+  return JSON.stringify(value, function (key, currentValue) {
+    if (typeof currentValue === "function") {
+      return undefined;
+    }
+
+    if (typeof currentValue === "bigint") {
+      return Number(currentValue);
+    }
+
+    if (currentValue && typeof currentValue === "object") {
+      if (currentValue.nodeType && typeof currentValue.cloneNode === "function") {
+        return undefined;
+      }
+
+      if (currentValue instanceof Map) {
+        if (seen.has(currentValue)) {
+          return undefined;
+        }
+        seen.add(currentValue);
+        const mapResult = {};
+        currentValue.forEach((mapValue, mapKey) => {
+          mapResult[mapKey] = mapValue;
+        });
+        return mapResult;
+      }
+
+      if (currentValue instanceof Set) {
+        if (seen.has(currentValue)) {
+          return undefined;
+        }
+        seen.add(currentValue);
+        return Array.from(currentValue.values());
+      }
+
+      if (seen.has(currentValue)) {
+        return undefined;
+      }
+      seen.add(currentValue);
+    }
+
+    return currentValue;
+  });
+};
+
+const cloneForStorage = (value, fallbackValue) => {
+  if (value === undefined) {
+    return fallbackValue;
   }
 
   try {
-    if (
-      typeof ko !== "undefined" &&
-      ko &&
-      typeof ko.isObservable === "function" &&
-      ko.isObservable(value)
-    ) {
-      return value();
+    const serialized = safeSerialize(value);
+
+    if (typeof serialized !== "string") {
+      return fallbackValue;
     }
+
+    return JSON.parse(serialized);
   } catch (err) {
-    // fall through to additional heuristics when Knockout is not available
+    return fallbackValue;
   }
 
-  if ("__ko_proto__" in value || typeof value.peek === "function") {
-    try {
-      return value();
-    } catch (err) {
-      return undefined;
-    }
-  }
-
-  return undefined;
-};
-
-const sanitizeForStorage = (value, seen = new WeakMap()) => {
-  if (typeof value === "function") {
-    const unwrapped = tryUnwrapObservable(value);
-    if (unwrapped === undefined) {
-      return undefined;
-    }
-    return sanitizeForStorage(unwrapped, seen);
-  }
-
-  if (value === null || typeof value !== "object") {
-    return value;
-  }
-
-  if (seen.has(value)) {
-    return seen.get(value);
-  }
-
-  if (value instanceof Date) {
-    return value.toISOString();
-  }
-
-  if (value instanceof Map) {
-    const mapResult = {};
-    seen.set(value, mapResult);
-    value.forEach((mapValue, key) => {
-      mapResult[key] = sanitizeForStorage(mapValue, seen);
-    });
-    return mapResult;
-  }
-
-  if (value instanceof Set) {
-    const setResult = [];
-    seen.set(value, setResult);
-    value.forEach((setValue) => {
-      setResult.push(sanitizeForStorage(setValue, seen));
-    });
-    return setResult;
-  }
-
-  if (Array.isArray(value)) {
-    const arr = [];
-    seen.set(value, arr);
-    value.forEach((item) => {
-      arr.push(sanitizeForStorage(item, seen));
-    });
-    return arr;
-  }
-
-  if (value.nodeType && typeof value.cloneNode === "function") {
-    return undefined;
-  }
-
-  const sanitizedObject = {};
-  seen.set(value, sanitizedObject);
-
-  Object.keys(value).forEach((key) => {
-    const currentValue = value[key];
-    if (typeof currentValue === "function") {
-      return;
-    }
-    const sanitizedValue = sanitizeForStorage(currentValue, seen);
-    if (sanitizedValue !== undefined) {
-      sanitizedObject[key] = sanitizedValue;
-    }
-  });
-
-  return sanitizedObject;
 };
 
 const createFilterSnapshot = (viewModel, buyerSetting) => {
   const criteria = viewModel?.searchCriteria
-    ? sanitizeForStorage(viewModel.searchCriteria)
+    ? cloneForStorage(viewModel.searchCriteria, {})
     : {};
-  const playerData = viewModel?.playerData
-    ? sanitizeForStorage(viewModel.playerData)
-    : null;
+  const playerData =
+    viewModel?.playerData !== undefined && viewModel?.playerData !== null
+      ? cloneForStorage(viewModel.playerData, null)
+      : null;
   const buyerSettings = buyerSetting
-    ? sanitizeForStorage(buyerSetting)
+    ? cloneForStorage(buyerSetting, {})
     : {};
 
   return {
@@ -223,7 +192,7 @@ export const downloadCurrentFilter = function (self) {
 
     const commonSettings = getValue("CommonSettings");
     if (commonSettings) {
-      downloadPayload.commonSettings = sanitizeForStorage(commonSettings);
+      downloadPayload.commonSettings = cloneForStorage(commonSettings, {});
     }
 
     downloadJson(downloadPayload, downloadFileName);
