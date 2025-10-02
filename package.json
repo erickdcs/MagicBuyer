@@ -7,7 +7,6 @@
     "build:dev": "webpack --mode development",
     "build:prod": "webpack --mode production",
     "serve": "webpack serve --mode development",
-    "auth:server": "node server/index.js",
     "build:mobile": "npx babel  dist/fut-auto-buyer.user.js --out-file dist/fut-auto-buyer.mobile.js --presets babel-preset-es2015"
   },
   "repository": {
@@ -24,10 +23,5 @@
     "webpack-cli": "^6.0.1",
     "webpack-dev-server": "^3.11.2",
     "webpack-userscript": "^2.5.8"
-  },
-  "dependencies": {
-    "cors": "^2.8.5",
-    "express": "^4.19.2",
-    "mysql2": "^3.9.7"
   }
 }

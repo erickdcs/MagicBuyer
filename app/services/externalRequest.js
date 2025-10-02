@@ -2,7 +2,7 @@ import { isMarketAlertApp } from "../app.constants";
 import { idSession } from "../elementIds.constants";
 import { setValue } from "../services/repository";
 
-export const sendExternalRequest = async (options = {}) => {
+export const sendExternalRequest = async (options) => {
   if (isMarketAlertApp) {
     sendPhoneRequest(options);
   } else {
@@ -11,42 +11,18 @@ export const sendExternalRequest = async (options = {}) => {
 };
 
 const sendPhoneRequest = (options) => {
-  const { onload, identifier, ...rest } = options;
-  if (identifier) {
-    setValue(identifier, onload);
-  }
+  setValue(options.identifier, options.onload);
+  delete options["onload"];
   window.ReactNativeWebView.postMessage(
-    JSON.stringify({
-      type: "fetchFromExternalAB",
-      payload: { options: { ...rest, identifier } },
-    })
+    JSON.stringify({ type: "fetchFromExternalAB", payload: { options } })
   );
 };
 
 const sendWebRequest = (options) => {
-  const {
-    method,
-    url,
-    data,
-    headers,
-    responseType,
-    timeout,
-    onload,
-    onerror,
-    ontimeout,
-  } = options;
-
-  const requestHeaders = Object.assign({ "User-Agent": idSession }, headers || {});
-
   GM_xmlhttpRequest({
-    method,
-    url,
-    data,
-    headers: requestHeaders,
-    responseType,
-    timeout,
-    onload,
-    onerror,
-    ontimeout,
+    method: options.method,
+    url: options.url,
+    onload: options.onload,
+    headers: { "User-Agent": idSession },
   });
 };
