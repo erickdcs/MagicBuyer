@@ -58,7 +58,7 @@ export const requireAuthentication = () => {
         }
 
         try {
-          /*controls.setLoading(true);
+          controls.setLoading(true);
           const result = await authenticateUser(username, password);
 
             if (!result || result.success === false) {
@@ -72,14 +72,14 @@ export const requireAuthentication = () => {
                   : "No fue posible iniciar sesión.");
             controls.showError(message);
             return;
-          }*/
+          }
 
-          //persistSession(result);
+          persistSession(result);
           controls.showSuccess("Sesión iniciada correctamente.");
 
           setTimeout(() => {
             controls.destroy();
-            //resolve(readSession());
+            resolve(readSession());
           }, 600);
         } catch (error) {
           controls.showError(error.message);
