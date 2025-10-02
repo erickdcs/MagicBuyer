@@ -30,54 +30,9 @@ JSUtils.inherits(
 
 AutoBuyerViewController.prototype.init = function () {
   searchFiltersViewInit.call(this);
-<<<<<<< HEAD
-  setValue("AutoBuyerInstance", this);
-
-  requireAuthentication()
-    .then(() => {
-      initializeAutoBuyerLayout.call(this);
-    })
-    .catch((error) => {
-      /* eslint-disable no-console */
-      console.error("No se pudo completar la autenticación de MagicBuyer", error);
-      /* eslint-enable no-console */
-    });
-};
-
-AutoBuyerViewController.prototype.viewDidAppear = function () {
-  this.getNavigationController().setNavigationVisibility(true, true);
-  searchFiltersViewAppear.call(this, false);
-};
-
-UTMarketSearchFiltersViewController.prototype.viewDidAppear = function () {
-  searchFiltersViewAppear.call(this, true);
-};
-
-const searchFiltersViewAppear = function (isTransferSearch) {
-  searchFiltersAppear.call(this);
-  let view = this.getView();
-  let root = $(view.__root);
-  if (!root.find(".filter-place").length) {
-    filterHeaderSettingsView.call(this, isTransferSearch).then((res) => {
-      root.find(".ut-item-search-view").first().prepend(res);
-    });
-  }
-};
-
-AutoBuyerViewController.prototype.getNavigationTitle = function () {
-  return `MagicBuyer`;
-};
-
-const initializeAutoBuyerLayout = function () {
-  const view = this.getView();
-  if (!isPhone() && view && view.__root) {
-    view.__root.style = "width: 100%; float: left;";
-  }
-=======
   let view = this.getView();
   if (!isPhone()) view.__root.style = "width: 100%; float: left;";
   setValue("AutoBuyerInstance", this);
->>>>>>> parent of 841de94 (Delay MagicBuyer login until tab opens)
 
   const menuItems = generateMenuItems.call(this);
   let root = $(view.__root);

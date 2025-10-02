@@ -29,7 +29,7 @@ export const saveFilterDetails = function (self) {
   let commonSettings = getValue("CommonSettings");
   setTimeout(function () {
     let settingsJson = {};
-    const viewModel = self._viewmodel;
+    const viewModel = self.viewmodel;
     settingsJson.searchCriteria = {
       criteria: viewModel.searchCriteria,
       playerData: viewModel.playerData,

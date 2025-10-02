@@ -24,7 +24,9 @@ import { generateButton } from "../../../utils/uiUtils/generateButton";
 let playerInput;
 
 export const destoryPlayerInput = () => {
-  playerInput.destroy();
+  if (playerInput && typeof playerInput.destroy === "function") {
+    playerInput.destroy();
+  }
   playerInput = null;
 };
 

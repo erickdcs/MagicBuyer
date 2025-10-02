@@ -80,9 +80,15 @@ export const clearSettingMenus = async function () {
   clearSettingsCache();
   await appendMenuItems();
   const autoBuyerInstance = getValue("AutoBuyerInstance");
-  UTMarketSearchFiltersViewController.prototype._eResetSelected.call(
-    autoBuyerInstance
-  );
+  const filtersPrototype = UTMarketSearchFiltersViewController.prototype;
+  const resetSelectedHelper =
+    filtersPrototype._eResetSelected ||
+    filtersPrototype.resetSelectedFilters ||
+    filtersPrototype.resetSelected;
+
+  if (typeof resetSelectedHelper === "function") {
+    resetSelectedHelper.call(autoBuyerInstance);
+  }
 };
 
 export const updateCommonSettings = async (isInit) => {
