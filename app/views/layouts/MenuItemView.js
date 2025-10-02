@@ -76,6 +76,7 @@ export const setDefaultActiveTab = () => {
 };
 
 export const clearSettingMenus = async function () {
+
   deleteAllMenu();
   clearSettingsCache();
   await appendMenuItems();
@@ -95,6 +96,7 @@ export const updateCommonSettings = async (isInit) => {
 };
 
 const appendMenuItems = async function (isInit) {
+
   menuItems.setActiveTab(0);
   menuRoot.append(buySettingsView.call(this));
   menuRoot.append(sellSettingsView.call(this));
