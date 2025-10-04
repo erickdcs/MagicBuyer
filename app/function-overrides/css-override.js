@@ -3,6 +3,27 @@ export const cssOverride = () => {
   $(".ui-orientation-warning").css("display", "none");
   $(".ut-fifa-header-view").css("display", "none");
   style.innerText = `
+  :root {
+    --mb-surface: #20263d;
+    --mb-surface-alt: #1a2033;
+    --mb-surface-elevated: #2b3452;
+    --mb-surface-muted: #232a41;
+    --mb-surface-deep: #0b0f1f;
+    --mb-accent: #4ee6eb;
+    --mb-accent-soft: rgba(78, 230, 235, 0.25);
+    --mb-brand: #2e86de;
+    --mb-success: #c4f750;
+    --mb-highlight: #ab92ff;
+    --mb-border-soft: rgba(78, 230, 235, 0.45);
+    --mb-border-success: rgba(196, 247, 80, 0.4);
+    --mb-border-highlight: rgba(171, 146, 255, 0.35);
+    --mb-text: #f5f7ff;
+    --mb-text-muted: rgba(245, 247, 255, 0.7);
+    --mb-disabled-bg: #3a435f;
+    --mb-disabled-text: rgba(245, 247, 255, 0.45);
+    --mb-neutral: #8a90a8;
+    --mb-link: #f0d7a1;
+  }
   .buyer-header {
       font-size: 20px !important;
   }
@@ -11,10 +32,17 @@ export const cssOverride = () => {
   }
   .buyer-settings {
       width: 100%;
+      background: radial-gradient(circle at top, rgba(78, 230, 235, 0.12), transparent 55%),
+        linear-gradient(160deg, var(--mb-surface) 0%, var(--mb-surface-alt) 100%);
   }
   .buyer-settings-field {
     margin-top: 15px;
     margin-bottom: 15px;
+    background: var(--mb-surface-muted);
+    border-radius: 18px;
+    box-shadow: 0 12px 24px rgba(8, 12, 26, 0.25);
+    border: 1px solid transparent;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
   }
   .phone .buyer-settings-field{
     margin-top: auto;
@@ -31,8 +59,14 @@ export const cssOverride = () => {
     justify-content: center;
   }
   .buyer-settings-field input:disabled {
-    background-color: #c3c6ce;
+    background-color: var(--mb-disabled-bg);
+    color: var(--mb-disabled-text);
     cursor: not-allowed;
+  }
+  .buyer-settings-field:focus-within {
+    border-color: var(--mb-accent);
+    box-shadow: 0 16px 32px rgba(78, 230, 235, 0.25);
+    transform: translateY(-1px);
   }
   .btn-test-notification
   {
@@ -44,18 +78,33 @@ export const cssOverride = () => {
   input[type="number"]{
     padding: 0 .5em;
     border-radius: 0;
-    background-color: #262c38;
-    border: 1px solid #4ee6eb;
+    background-color: var(--mb-surface-elevated);
+    border: 1px solid var(--mb-accent);
     box-sizing: border-box;
-    color: #4ee6eb;
+    color: var(--mb-accent);
     font-family: UltimateTeam,sans-serif;
     font-size: 1em;
     height: 2.8em;
     opacity: 1;
     width: 100%;
+    border-radius: 12px;
+    transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, color 0.3s ease;
+  }
+  input[type="number"]:focus {
+    background-color: var(--mb-surface);
+    color: var(--mb-text);
+    border-color: var(--mb-accent);
+    box-shadow: 0 0 0 3px var(--mb-accent-soft);
+  }
+  input[type="number"]:hover:not(:disabled) {
+    border-color: var(--mb-accent);
+    box-shadow: 0 10px 20px rgba(8, 12, 26, 0.2);
+  }
+  input[type="number"]:disabled {
+    border-color: transparent;
   }
   .autoBuyerLog {
-    font-size: ${!isPhone() ? "15px" : "13px"}; 
+    font-size: ${!isPhone() ? "15px" : "13px"};
     height: 50%;
   }
   .cardPalyerLi {
@@ -64,16 +113,18 @@ export const cssOverride = () => {
   .cardPalyer {
     transition: 0.3s;
     width: 80%;
-    background: #222F3E;
-    color: white;
+    background: var(--mb-surface);
+    color: var(--mb-text);
     margin-bottom: 1%;
     font-size: 1rem;
     border-radius: 30px;
     display: flex;
-    border: solid #2E86DE;
+    border: solid var(--mb-brand);
+    box-shadow: 0 12px 24px rgba(8, 12, 26, 0.3);
   }
   .cardPalyer:hover {
-    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+    box-shadow: 0 16px 30px rgba(78, 230, 235, 0.2);
+    transform: translateY(-2px);
   }
   .container {
     display: flex;
@@ -85,7 +136,7 @@ export const cssOverride = () => {
   }
   .typeContent {
     width: 300px;
-    background: #2E86DE;
+    background: var(--mb-brand);
     height: 100%;
     border-radius: 30px;
     border-radius-right: 20px;
@@ -97,7 +148,7 @@ export const cssOverride = () => {
   }
   .typeContentText {
     font-size: 7rem;
-    color: #C8D6E5;
+    color: var(--mb-text-muted);
   }
   .searchLog {
     font-size: 10px; 
@@ -128,35 +179,58 @@ export const cssOverride = () => {
     padding: 10px;
     font-family: UltimateTeamCondensed, sans-serif;
     font-size: 1.6em;
-    color: #e2dde2;
+    color: var(--mb-text-muted);
     text-transform: uppercase;
-    background-color: #171826;
+    background-color: var(--mb-surface-alt);
   }
   .selected-filters-container {
-    background: rgba(23, 24, 38, 0.6);
-    border: 1px solid rgba(78, 230, 235, 0.45);
-    border-radius: 8px;
+    background: var(--mb-surface-muted);
+    border: 1px solid var(--mb-border-soft);
+    border-radius: 20px;
+    box-shadow: 0 18px 32px rgba(8, 12, 26, 0.28);
+    transition: box-shadow 0.3s ease, border-color 0.3s ease;
+  }
+  .selected-filters-container:hover,
+  .selected-filters-container:focus-within {
+    border-color: var(--mb-accent);
+    box-shadow: 0 24px 38px rgba(78, 230, 235, 0.28);
   }
   .selected-filters-list {
-    background-color: #131626;
-    border: 1px solid #4ee6eb;
+    background-color: var(--mb-surface-alt);
+    border: 1px solid var(--mb-accent);
     border-radius: 6px;
   }
   .filter-loader-block {
-    background: rgba(18, 20, 33, 0.65);
-    border: 1px solid rgba(196, 247, 80, 0.4);
-    border-radius: 8px;
+    background: var(--mb-surface-muted);
+    border: 1px solid var(--mb-border-success);
+    border-radius: 20px;
+    box-shadow: 0 18px 32px rgba(8, 12, 26, 0.28);
+    transition: box-shadow 0.3s ease, border-color 0.3s ease;
+  }
+  .filter-loader-block:hover,
+  .filter-loader-block:focus-within {
+    border-color: var(--mb-success);
+    box-shadow: 0 24px 38px rgba(196, 247, 80, 0.28);
   }
   .filter-loader {
-    background-color: #090c1a;
-    border: 1px solid #c4f750;
+    background-color: var(--mb-surface-deep);
+    border: 1px solid var(--mb-success);
     border-radius: 6px;
   }
   .filter-sync-block,
   .filter-actions-block {
-    background: rgba(20, 22, 34, 0.55);
-    border: 1px solid rgba(171, 146, 255, 0.35);
-    border-radius: 8px;
+    background: var(--mb-surface-muted);
+    border: 1px solid var(--mb-border-highlight);
+    border-radius: 20px;
+    box-shadow: 0 18px 32px rgba(8, 12, 26, 0.28);
+    transition: box-shadow 0.3s ease, border-color 0.3s ease;
+  }
+  .filter-sync-block:hover,
+  .filter-sync-block:focus-within,
+  .filter-actions-block:hover,
+  .filter-actions-block:focus-within {
+    border-color: var(--mb-highlight);
+    box-shadow: 0 24px 38px rgba(171, 146, 255, 0.25);
   }
   .filter-sync-actions,
   .filter-actions {
@@ -168,6 +242,31 @@ export const cssOverride = () => {
   .filter-sync-actions .btn-standard,
   .filter-actions .btn-standard {
     flex: 1 1 45%;
+    background: var(--mb-accent-soft);
+    color: var(--mb-text);
+    border-radius: 14px;
+    border: 1px solid var(--mb-accent);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+  }
+  .filter-sync-actions .btn-standard:hover,
+  .filter-actions .btn-standard:hover {
+    background: var(--mb-accent);
+    color: var(--mb-surface-deep);
+    box-shadow: 0 12px 24px rgba(78, 230, 235, 0.3);
+    transform: translateY(-1px);
+  }
+  .filter-sync-actions .btn-standard:focus,
+  .filter-actions .btn-standard:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--mb-accent-soft);
+  }
+  .filter-sync-actions .btn-standard:disabled,
+  .filter-actions .btn-standard:disabled {
+    background: var(--mb-disabled-bg);
+    color: var(--mb-disabled-text);
+    border-color: transparent;
+    box-shadow: none;
+    transform: none;
   }
   .btn-save-filter {
     width:100%
@@ -188,7 +287,7 @@ export const cssOverride = () => {
     align-items: center;
   }
   .button-clear button {
-    color: #fff;
+    color: var(--mb-text);
     background-color: unset;
     height: unset;
     line-height: unset;
@@ -206,22 +305,22 @@ export const cssOverride = () => {
   }
   .filterSync {
     background: transparent;
-    color: #c4f750;
+    color: var(--mb-success);
     text-overflow: clip;
   }
   .filterSync:hover {
     background: transparent !important;
   }
   .stats-progress {
-    float: right; 
-    height: 10px; 
-    width: 100px; 
-    background: #888; 
+    float: right;
+    height: 10px;
+    width: 100px;
+    background: var(--mb-neutral);
     margin: ${isPhone() ? "auto 5px" : "5px 0px 5px 5px"};
   }
   .stats-fill {
-    background: #000; 
-    height: 10px; 
+    background: var(--mb-surface-deep);
+    height: 10px;
     width: 0%
   }
   .numericInput:invalid {
@@ -283,7 +382,7 @@ export const cssOverride = () => {
     position: absolute;
     right: 25px;
     top: 50%;
-    color: wheat
+    color: var(--mb-link)
   }
   .phone .joinServer{
     display: none;
