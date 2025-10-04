@@ -17,6 +17,11 @@ import { generateButton } from "../../../utils/uiUtils/generateButton";
 import { generateTextInput } from "../../../utils/uiUtils/generateTextInput";
 import { generateToggleInput } from "../../../utils/uiUtils/generateToggleInput";
 import {
+  downloadIcon,
+  stackIcon,
+  uploadIcon,
+} from "../../../utils/uiUtils/icons";
+import {
   deleteFilter,
   loadFilter,
   saveFilterDetails,
@@ -51,13 +56,10 @@ $(document).on(
 
 const handleToggle = (evt, key) => {
   let runSequentially = getValue(key);
-  if (runSequentially) {
-    runSequentially = false;
-    $(evt.currentTarget).removeClass("toggled");
-  } else {
-    runSequentially = true;
-    $(evt.currentTarget).addClass("toggled");
-  }
+  runSequentially = !runSequentially;
+  const $target = $(evt.currentTarget);
+  $target.toggleClass("is-on", runSequentially);
+  $target.attr("aria-checked", runSequentially);
   setValue(key, runSequentially);
   return runSequentially;
 };
@@ -96,7 +98,8 @@ export const filterSettingsView = async function () {
                   "number",
                   null,
                   "buyer-settings-field",
-                  (value) => setValue("fiterSearchCount", parseInt(value) || 3)
+                  (value) => setValue("fiterSearchCount", parseInt(value) || 3),
+                  stackIcon
                 )}
                 ${generateToggleInput(
                   "Switch filter sequentially",
@@ -222,21 +225,29 @@ export const filterHeaderSettingsView = async function (isTransferSearch) {
                       <div class="button-container btn-filters filter-sync-actions">
                         ${generateButton(
                           idAbUploadFilter,
-                          "⇧",
+                          "Upload",
                           () => {
                             uploadFilters();
                           },
                           "filterSync",
-                          "Upload filters"
+                          {
+                            leadingIcon: uploadIcon,
+                            density: "compact",
+                            title: "Upload filters",
+                          }
                         )}
                         ${generateButton(
                           idAbDownloadFilter,
-                          "⇩",
+                          "Download",
                           () => {
                             downloadFilters();
                           },
                           "filterSync",
-                          "Download filters"
+                          {
+                            leadingIcon: downloadIcon,
+                            density: "compact",
+                            title: "Download filters",
+                          }
                         )}
                       </div>
                     </div>

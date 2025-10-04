@@ -21,6 +21,11 @@ import { generateTextInput } from "../../../utils/uiUtils/generateTextInput";
 import { checkAndAppendOption } from "../../../utils/filterUtil";
 import { getValue, setValue } from "../../../services/repository";
 import { generateButton } from "../../../utils/uiUtils/generateButton";
+import {
+  coinIcon,
+  searchIcon,
+  starIcon,
+} from "../../../utils/uiUtils/icons";
 let playerInput;
 
 export const destoryPlayerInput = () => {
@@ -141,28 +146,48 @@ export const searchSettingsView = function () {
       10,
       { idAbMinRating },
       "Minimum Player Rating",
-      "BuyerSettings"
+      "BuyerSettings",
+      undefined,
+      undefined,
+      undefined,
+      null,
+      starIcon
     )}
     ${generateTextInput(
       "Max Rating",
       100,
       { idAbMaxRating },
       "Maximum Player Rating",
-      "BuyerSettings"
-    )}    
+      "BuyerSettings",
+      undefined,
+      undefined,
+      undefined,
+      null,
+      starIcon
+    )}
     ${generateTextInput(
       "Search result page limit",
       5,
       { idAbMaxSearchPage },
       "No of. pages bot should move forward before going back to page 1",
-      "BuyerSettings"
+      "BuyerSettings",
+      undefined,
+      undefined,
+      undefined,
+      null,
+      searchIcon
     )}
     ${generateTextInput(
       "Max value of random min bid",
       300,
       { idAbRandMinBidInput },
       "",
-      "BuyerSettings"
+      "BuyerSettings",
+      undefined,
+      undefined,
+      undefined,
+      null,
+      coinIcon
     )}
     ${generateToggleInput(
       "Use random min bid",
@@ -175,7 +200,12 @@ export const searchSettingsView = function () {
       300,
       { idAbRandMinBuyInput },
       "",
-      "BuyerSettings"
+      "BuyerSettings",
+      undefined,
+      undefined,
+      undefined,
+      null,
+      coinIcon
     )}
     ${generateToggleInput(
       "Use random min buy",

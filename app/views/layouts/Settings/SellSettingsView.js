@@ -13,6 +13,13 @@ import {
 import { getDataSource } from "../../../services/repository";
 import { generateTextInput } from "../../../utils/uiUtils/generateTextInput";
 import { generateToggleInput } from "../../../utils/uiUtils/generateToggleInput";
+import {
+  clockIcon,
+  coinIcon,
+  percentIcon,
+  stackIcon,
+  starIcon,
+} from "../../../utils/uiUtils/icons";
 
 $(document).on("keyup", "#" + idAbSellPrice, function ({ target: { value } }) {
   updateAfterTax(value);
@@ -44,7 +51,10 @@ export const sellSettingsView = function () {
     `(Sale Price percent of ${dataSource} Price)`,
     "BuyerSettings",
     "text",
-    "\\d+-\\d+$"
+    "\\d+-\\d+$",
+    undefined,
+    null,
+    percentIcon
   )}
   ${generateToggleInput(
     "Check buy price before listing",
@@ -57,8 +67,13 @@ export const sellSettingsView = function () {
     "",
     { idAbSellPrice },
     `(-1 to send to transferlist)<br />Receive After Tax: <span id=${idSellAfterTax}>0</span>`,
-    "BuyerSettings"
-  )} 
+    "BuyerSettings",
+    undefined,
+    undefined,
+    undefined,
+    null,
+    coinIcon
+  )}
    ${generateTextInput(
      "List Duration",
      "1H",
@@ -66,21 +81,34 @@ export const sellSettingsView = function () {
      "List Duration when listing",
      "BuyerSettings",
      "text",
-     "\\d+[H|M|S|h|m|s]$"
+     "\\d+[H|M|S|h|m|s]$",
+     undefined,
+     null,
+     clockIcon
    )}
   ${generateTextInput(
     "Clear sold count",
     10,
     { idAbMinDeleteCount },
     "(Clear sold items when reach a specified count)",
-    "BuyerSettings"
+    "BuyerSettings",
+    undefined,
+    undefined,
+    undefined,
+    null,
+    stackIcon
   )}
   ${generateTextInput(
     "Rating Threshold",
     100,
     { idSellRatingThreshold },
     "(Rating threshold to list the sniped player)",
-    "BuyerSettings"
+    "BuyerSettings",
+    undefined,
+    undefined,
+    undefined,
+    null,
+    starIcon
   )}
   ${generateToggleInput(
     "Relist Unsold Items",

@@ -12,6 +12,13 @@ import {
 import { getDataSource } from "../../../services/repository";
 import { generateTextInput } from "../../../utils/uiUtils/generateTextInput";
 import { generateToggleInput } from "../../../utils/uiUtils/generateToggleInput";
+import {
+  clockIcon,
+  coinIcon,
+  percentIcon,
+  searchIcon,
+  stackIcon,
+} from "../../../utils/uiUtils/icons";
 
 export const buySettingsView = function () {
   const dataSource = getDataSource();
@@ -27,7 +34,12 @@ export const buySettingsView = function () {
         100,
         { idBuyFutBinPercent },
         `(Buy/Bid Price percent of ${dataSource} Price)`,
-        "BuyerSettings"
+        "BuyerSettings",
+        undefined,
+        undefined,
+        undefined,
+        null,
+        percentIcon
       )}
       ${generateToggleInput(
         `Bid For ${dataSource} Price`,
@@ -40,21 +52,36 @@ export const buySettingsView = function () {
         "",
         { idAbBuyPrice },
         "<br/>",
-        "BuyerSettings"
+        "BuyerSettings",
+        undefined,
+        undefined,
+        undefined,
+        null,
+        coinIcon
       )}
       ${generateTextInput(
         "No. of cards to buy",
         1000,
         { idAbCardCount },
         "(Works only with Buy price)",
-        "BuyerSettings"
+        "BuyerSettings",
+        undefined,
+        undefined,
+        undefined,
+        null,
+        stackIcon
       )}
       ${generateTextInput(
         "Bid Price",
         "",
         { idAbMaxBid },
         "<br/>",
-        "BuyerSettings"
+        "BuyerSettings",
+        undefined,
+        undefined,
+        undefined,
+        null,
+        coinIcon
       )}
       ${generateTextInput(
         "Bid items expiring in",
@@ -63,14 +90,22 @@ export const buySettingsView = function () {
         "(S for seconds, M for Minutes, H for hours)",
         "BuyerSettings",
         "text",
-        "\\d+[H|M|S|h|m|s]$"
-      )} 
+        "\\d+[H|M|S|h|m|s]$",
+        undefined,
+        null,
+        clockIcon
+      )}
       ${generateTextInput(
         "Search result threshold",
         21,
         { idAbSearchResult },
         "(Buy or bid cards only if the no.of search results is lesser than the specified value)",
-        "BuyerSettings"
+        "BuyerSettings",
+        undefined,
+        undefined,
+        undefined,
+        null,
+        searchIcon
       )}
       ${generateToggleInput(
         "Bid Exact Price",

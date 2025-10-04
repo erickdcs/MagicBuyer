@@ -205,10 +205,12 @@ export const updateSettingsView = function (settings) {
     const id = `#${ElementIds[key]}`;
     if (typeof value == "boolean") {
       if (value) {
-        $(id).addClass("toggled");
+        $(id).addClass("is-on");
+        $(id).attr("aria-checked", true);
         continue;
       }
-      $(id).removeClass("toggled");
+      $(id).removeClass("is-on");
+      $(id).attr("aria-checked", false);
     } else {
       $(id).val(value);
     }

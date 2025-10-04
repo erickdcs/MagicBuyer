@@ -9,6 +9,12 @@ import {
 } from "../../../elementIds.constants";
 import { generateTextInput } from "../../../utils/uiUtils/generateTextInput";
 import { generateToggleInput } from "../../../utils/uiUtils/generateToggleInput";
+import {
+  keyIcon,
+  networkIcon,
+  userIcon,
+  lockIcon,
+} from "../../../utils/uiUtils/icons";
 
 export const captchaSettingsView = function () {
   return `<div style='display : none' class='buyer-settings-wrapper captcha-settings-view'>
@@ -30,7 +36,11 @@ export const captchaSettingsView = function () {
       { idAntiCaptchKey },
       "",
       "CommonSettings",
-      "text"
+      "text",
+      undefined,
+      undefined,
+      null,
+      keyIcon
     )}
     ${generateTextInput(
       "Proxy Address",
@@ -38,14 +48,23 @@ export const captchaSettingsView = function () {
       { idProxyAddress },
       "",
       "CommonSettings",
-      "text"
+      "text",
+      undefined,
+      undefined,
+      null,
+      networkIcon
     )}
     ${generateTextInput(
       "Proxy Port",
       "",
       { idProxyPort },
       "",
-      "CommonSettings"
+      "CommonSettings",
+      undefined,
+      undefined,
+      undefined,
+      null,
+      networkIcon
     )}
     ${generateTextInput(
       "Proxy User Name (Optional)",
@@ -53,7 +72,11 @@ export const captchaSettingsView = function () {
       { idProxyLogin },
       "",
       "CommonSettings",
-      "text"
+      "text",
+      undefined,
+      undefined,
+      null,
+      userIcon
     )}
     ${generateTextInput(
       "Proxy User Password (Optional)",
@@ -61,7 +84,11 @@ export const captchaSettingsView = function () {
       { idProxyPassword },
       "",
       "CommonSettings",
-      "text"
-    )} 
+      "text",
+      undefined,
+      undefined,
+      null,
+      lockIcon
+    )}
     `;
 };

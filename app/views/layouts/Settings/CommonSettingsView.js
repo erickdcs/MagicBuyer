@@ -8,6 +8,11 @@ import {
 } from "../../../elementIds.constants";
 import { generateTextInput } from "../../../utils/uiUtils/generateTextInput";
 import { generateToggleInput } from "../../../utils/uiUtils/generateToggleInput";
+import {
+  clockIcon,
+  shieldIcon,
+  stackIcon,
+} from "../../../utils/uiUtils/icons";
 
 export const commonSettingsView = function () {
   return `<div style='display : none' class='buyer-settings-wrapper common-settings-view'>
@@ -18,14 +23,22 @@ export const commonSettingsView = function () {
     "(Eg. 412,421,521)",
     "CommonSettings",
     "text",
-    "^\\d+(,\\d+)*$"
+    "^\\d+(,\\d+)*$",
+    undefined,
+    null,
+    shieldIcon
   )}
   ${generateTextInput(
     "No. of times error code should occur",
     3,
     { idAbStopErrorCodeCount },
     "<br />",
-    "CommonSettings"
+    "CommonSettings",
+    undefined,
+    undefined,
+    undefined,
+    null,
+    stackIcon
   )}
   ${generateTextInput(
     "Resume bot after",
@@ -34,7 +47,10 @@ export const commonSettingsView = function () {
     "(S for seconds, M for Minutes, H for hours eg. 0-0S)",
     "CommonSettings",
     "text",
-    "\\d+-\\d+[H|M|S|h|m|s]$"
+    "\\d+-\\d+[H|M|S|h|m|s]$",
+    undefined,
+    null,
+    clockIcon
   )}
   ${generateToggleInput(
     "Auto Clear Log",
