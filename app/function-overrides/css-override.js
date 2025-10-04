@@ -132,6 +132,43 @@ export const cssOverride = () => {
     text-transform: uppercase;
     background-color: #171826;
   }
+  .selected-filters-container {
+    background: rgba(23, 24, 38, 0.6);
+    border: 1px solid rgba(78, 230, 235, 0.45);
+    border-radius: 8px;
+  }
+  .selected-filters-list {
+    background-color: #131626;
+    border: 1px solid #4ee6eb;
+    border-radius: 6px;
+  }
+  .filter-loader-block {
+    background: rgba(18, 20, 33, 0.65);
+    border: 1px solid rgba(196, 247, 80, 0.4);
+    border-radius: 8px;
+  }
+  .filter-loader {
+    background-color: #090c1a;
+    border: 1px solid #c4f750;
+    border-radius: 6px;
+  }
+  .filter-sync-block,
+  .filter-actions-block {
+    background: rgba(20, 22, 34, 0.55);
+    border: 1px solid rgba(171, 146, 255, 0.35);
+    border-radius: 8px;
+  }
+  .filter-sync-actions,
+  .filter-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .filter-sync-actions .btn-standard,
+  .filter-actions .btn-standard {
+    flex: 1 1 45%;
+  }
   .btn-save-filter {
     width:100%
   }

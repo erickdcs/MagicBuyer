@@ -70,13 +70,22 @@ export const filterSettingsView = async function () {
     });
   }
   return `<div style='display : none' class='buyer-settings-wrapper filter-settings-view'>
-                <div class="price-filter buyer-settings-field multiple-filter teleporter">
-                    <select  multiple="multiple" class="multiselect-filter filter-header-settings" id="${idSelectedFilter}"
-                     name="selectedFilters" style="overflow-y : scroll;">
-                     ${Object.keys(await filters()).map(
-                       (value) => `<option value='${value}'>${value}</option>`
-                     )}
-                    </select>
+                <div class="selected-filters-teleporter teleporter">
+                  <div class="price-filter buyer-settings-field multiple-filter selected-filters-container">
+                    <div class="info">
+                      <span class="secondary label">Filtros activos<br/><small>Selecciona los filtros que estarán en ejecución</small></span>
+                    </div>
+                    <div class="buttonInfo">
+                      <div class="inputBox">
+                        <select  multiple="multiple" class="multiselect-filter filter-header-settings selected-filters-list" id="${idSelectedFilter}"
+                         name="selectedFilters" style="overflow-y : scroll;">
+                         ${Object.keys(await filters()).map(
+                           (value) => `<option value='${value}'>${value}</option>`
+                         )}
+                        </select>
+                      </div>
+                    </div>
+                  </div>
                 </div>
                 ${generateTextInput(
                   "No. of search For each filter",
@@ -163,11 +172,14 @@ export const filterHeaderSettingsView = async function (isTransferSearch) {
                     "runner",
                     (evt) => {
                       const isToggled = handleToggle(evt, "runnerToggle");
+                      const selectedFilters = $(`#${idSelectedFilter}`).closest(
+                        ".selected-filters-container"
+                      );
                       $(".auto-buyer").toggleClass("displayNone");
                       if (isToggled) {
-                        $(".filter-place").append($(`#${idSelectedFilter}`));
+                        $(".filter-place").append(selectedFilters);
                       } else {
-                        $(".teleporter").append($(`#${idSelectedFilter}`));
+                        $(".selected-filters-teleporter").append(selectedFilters);
                       }
                     }
                   )
@@ -179,51 +191,70 @@ export const filterHeaderSettingsView = async function (isTransferSearch) {
                 : ""
             }         
             <div class="price-filter buyer-settings-field multiple-filter filter-place">
-            </div> 
-            <div class="button-container btn-filters">
-                 <select class="filter-header-settings" id='${idFilterDropdown}${filterId}'>
+            </div>
+            <div class="price-filter buyer-settings-field filter-loader-block">
+              <div class="info">
+                <span class="secondary label">Cargar filtro<br/><small>Selecciona un filtro guardado para aplicarlo</small></span>
+              </div>
+              <div class="buttonInfo">
+                <div class="inputBox">
+                  <select class="filter-header-settings filter-loader" id='${idFilterDropdown}${filterId}'>
                     <option selected="true" disabled>Choose filter to load</option>
                     ${
                       !isTransferSearch
                         ? `<option value="_default">_DEFAULT</option>`
                         : ""
-                    }  
+                    }
                     ${Object.keys(await filters()).map(
                       (value) => `<option value="${value}">${value}</option>`
-                    )}                    
-                 </select>                 
-                ${
-                  !isTransferSearch
-                    ? generateButton(
-                        idAbUploadFilter,
-                        "⇧",
-                        () => {
-                          uploadFilters();
-                        },
-                        "filterSync",
-                        "Upload filters"
-                      )
-                    : ""
-                }
-               ${
-                 !isTransferSearch
-                   ? generateButton(
-                       idAbDownloadFilter,
-                       "⇩",
-                       () => {
-                         downloadFilters();
-                       },
-                       "filterSync",
-                       "Download filters"
-                     )
-                   : ""
-               }
-             </div> 
-               ${
-                 !isTransferSearch
-                   ? `<div id=${idBtnActions} style="margin-top: 1%;" class="button-container btn-filters"></div>`
-                   : ""
-               }
+                    )}
+                  </select>
+                </div>
+              </div>
+            </div>
+            ${
+              !isTransferSearch
+                ? `<div class="price-filter buyer-settings-field filter-sync-block">
+                    <div class="info">
+                      <span class="secondary label">Sincronizar filtros<br/><small>Sube o descarga tu colección</small></span>
+                    </div>
+                    <div class="buttonInfo">
+                      <div class="button-container btn-filters filter-sync-actions">
+                        ${generateButton(
+                          idAbUploadFilter,
+                          "⇧",
+                          () => {
+                            uploadFilters();
+                          },
+                          "filterSync",
+                          "Upload filters"
+                        )}
+                        ${generateButton(
+                          idAbDownloadFilter,
+                          "⇩",
+                          () => {
+                            downloadFilters();
+                          },
+                          "filterSync",
+                          "Download filters"
+                        )}
+                      </div>
+                    </div>
+                  </div>`
+                : ""
+            }
+            ${
+              !isTransferSearch
+                ? `<div class="price-filter buyer-settings-field filter-actions-block">
+                    <div class="info">
+                      <span class="secondary label">Gestionar filtro<br/><small>Guarda los cambios o elimina el filtro actual</small></span>
+                    </div>
+                    <div class="buttonInfo">
+                      <div id=${idBtnActions} class="button-container btn-filters filter-actions"></div>
+                    </div>
+                  </div>`
+                : ""
+            }
              </div>`);
 
   !isTransferSearch && appendButtons.call(this, rootHeader, context);
