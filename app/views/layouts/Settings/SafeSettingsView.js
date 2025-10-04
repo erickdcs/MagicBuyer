@@ -10,6 +10,7 @@ import {
 } from "../../../elementIds.constants";
 import { generateTextInput } from "../../../utils/uiUtils/generateTextInput";
 import { generateToggleInput } from "../../../utils/uiUtils/generateToggleInput";
+import { clockIcon, stackIcon } from "../../../utils/uiUtils/icons";
 
 export const safeSettingsView = function () {
   return `<div style='display : none' class='buyer-settings-wrapper safety-settings-view'>
@@ -20,14 +21,22 @@ export const safeSettingsView = function () {
     "(Random second range eg. 7-15)",
     "CommonSettings",
     "text",
-    "\\d+-\\d+$"
+    "\\d+-\\d+$",
+    undefined,
+    null,
+    clockIcon
   )}
   ${generateTextInput(
     "Max purchases per search request",
     1,
     { idAbMaxPurchases },
     "Increase this, only if you are Adding Delay After Buy of alteast 3S",
-    "CommonSettings"
+    "CommonSettings",
+    undefined,
+    undefined,
+    undefined,
+    null,
+    stackIcon
   )}
   ${generateTextInput(
     "Pause Cycle",
@@ -36,7 +45,10 @@ export const safeSettingsView = function () {
     "(No. of searches performed before triggering Pause eg. 10-15)",
     "CommonSettings",
     "text",
-    "\\d+-\\d+$"
+    "\\d+-\\d+$",
+    undefined,
+    null,
+    clockIcon
   )}
   ${generateTextInput(
     "Pause For",
@@ -45,7 +57,10 @@ export const safeSettingsView = function () {
     "(S for seconds, M for Minutes, H for hours eg. 0-0S)",
     "CommonSettings",
     "text",
-    "\\d+-\\d+[H|M|S|h|m|s]$"
+    "\\d+-\\d+[H|M|S|h|m|s]$",
+    undefined,
+    null,
+    clockIcon
   )}
   ${generateToggleInput(
     "Add Delay After Buy",
@@ -60,7 +75,10 @@ export const safeSettingsView = function () {
     "(S for seconds, M for Minutes, H for hours)",
     "CommonSettings",
     "text",
-    "\\d+[H|M|S|h|m|s]$"
+    "\\d+[H|M|S|h|m|s]$",
+    undefined,
+    null,
+    clockIcon
   )}
   ${generateTextInput(
     "Stop After",
@@ -69,7 +87,10 @@ export const safeSettingsView = function () {
     "(S for seconds, M for Minutes, H for hours  eg. 3-4H)",
     "CommonSettings",
     "text",
-    "\\d+-\\d+[H|M|S|h|m|s]$"
+    "\\d+-\\d+[H|M|S|h|m|s]$",
+    undefined,
+    null,
+    clockIcon
   )}
   ${generateToggleInput(
     "Show Search Exceed Warning",

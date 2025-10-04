@@ -36,37 +36,250 @@ export const cssOverride = () => {
         linear-gradient(160deg, var(--mb-surface) 0%, var(--mb-surface-alt) 100%);
   }
   .buyer-settings-field {
-    margin-top: 15px;
-    margin-bottom: 15px;
+    margin: 15px 0;
+    padding: 18px 20px;
     background: var(--mb-surface-muted);
     border-radius: 18px;
     box-shadow: 0 12px 24px rgba(8, 12, 26, 0.25);
     border: 1px solid transparent;
     transition: background-color 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
   }
-  .phone .buyer-settings-field{
-    margin-top: auto;
-    margin-bottom: auto;
-    width: 100%;
-    padding: 10px;
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
   }
-  .buyer-settings-wrapper {
-    display: flex; 
-    flex-wrap: wrap; 
-    margin-top: 20px;
+  .field__control {
+    display: flex;
+    align-items: center;
+    gap: 12px;
   }
-  .buyer-settings-field .ut-toggle-cell-view{
+  .field__icon {
+    display: inline-flex;
+    align-items: center;
     justify-content: center;
+    width: 28px;
+    height: 28px;
+    color: var(--mb-accent);
+    background: rgba(78, 230, 235, 0.1);
+    border-radius: 10px;
+    box-shadow: inset 0 0 0 1px var(--mb-border-soft);
   }
-  .buyer-settings-field input:disabled {
+  .field__input-wrapper {
+    position: relative;
+    flex: 1;
+  }
+  .field__input {
+    width: 100%;
+    background-color: var(--mb-surface-elevated);
+    border: 1px solid var(--mb-border-soft);
+    border-radius: 12px;
+    box-sizing: border-box;
+    color: var(--mb-text);
+    font-family: UltimateTeam, sans-serif;
+    font-size: 1em;
+    padding: 16px 18px;
+    transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, color 0.3s ease;
+  }
+  .field__input::placeholder {
+    color: transparent;
+  }
+  .field__input:focus {
+    background-color: var(--mb-surface);
+    color: var(--mb-text);
+    border-color: var(--mb-accent);
+    box-shadow: 0 0 0 3px var(--mb-accent-soft);
+    outline: none;
+  }
+  .field__input:disabled {
     background-color: var(--mb-disabled-bg);
+    border-color: transparent;
     color: var(--mb-disabled-text);
     cursor: not-allowed;
+  }
+  .field__label {
+    position: absolute;
+    top: 50%;
+    left: 18px;
+    transform: translateY(-50%);
+    color: var(--mb-text-muted);
+    font-size: 0.95em;
+    pointer-events: none;
+    transition: transform 0.2s ease, color 0.2s ease, font-size 0.2s ease, top 0.2s ease;
+    background: transparent;
+  }
+  .field__input:focus + .field__label,
+  .field__input:not(:placeholder-shown) + .field__label {
+    top: 6px;
+    font-size: 0.72em;
+    color: var(--mb-accent);
+    transform: translateY(0);
+    padding: 0 6px;
+    background: var(--mb-surface-muted);
+    border-radius: 6px;
+  }
+  .field__helper {
+    font-size: 0.8em;
+    color: var(--mb-text-muted);
+    line-height: 1.4;
+  }
+  .field--with-icon .field__helper {
+    padding-left: 40px;
+  }
+  .field--with-icon .field__input-wrapper {
+    width: 100%;
   }
   .buyer-settings-field:focus-within {
     border-color: var(--mb-accent);
     box-shadow: 0 16px 32px rgba(78, 230, 235, 0.25);
     transform: translateY(-1px);
+  }
+  .buyer-settings-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 20px;
+  }
+  .phone .buyer-settings-field{
+    margin-top: auto;
+    margin-bottom: auto;
+    width: 100%;
+    padding: 16px;
+  }
+  .field-toggle {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .field-toggle__label-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    color: var(--mb-text);
+  }
+  .field-toggle__label {
+    font-size: 1em;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+  .field-toggle__helper {
+    font-size: 0.75em;
+    color: var(--mb-text-muted);
+    line-height: 1.4;
+  }
+  .toggle-switch {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 54px;
+    height: 30px;
+    padding: 0;
+    border: none;
+    border-radius: 999px;
+    background: transparent;
+    cursor: pointer;
+    transition: transform 0.25s ease;
+  }
+  .toggle-switch:focus-visible {
+    outline: 2px solid var(--mb-accent);
+    outline-offset: 2px;
+  }
+  .toggle-switch__track {
+    position: absolute;
+    inset: 0;
+    background: var(--mb-disabled-bg);
+    border-radius: 999px;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.15);
+    transition: background-color 0.25s ease, box-shadow 0.25s ease;
+  }
+  .toggle-switch__thumb {
+    position: absolute;
+    left: 4px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--mb-text);
+    box-shadow: 0 6px 16px rgba(8, 12, 26, 0.35);
+    transition: transform 0.25s ease, background-color 0.25s ease, box-shadow 0.25s ease;
+  }
+  .toggle-switch.is-on .toggle-switch__track {
+    background: linear-gradient(135deg, var(--mb-accent) 0%, var(--mb-highlight) 100%);
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.25);
+  }
+  .toggle-switch.is-on .toggle-switch__thumb {
+    transform: translateX(24px);
+    background: var(--mb-surface);
+    box-shadow: 0 6px 18px rgba(171, 146, 255, 0.35);
+  }
+  .btn-standard {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 0.85rem 1.8rem;
+    border-radius: 16px;
+    border: 1px solid var(--mb-border-soft);
+    background: linear-gradient(135deg, rgba(78, 230, 235, 0.15), rgba(171, 146, 255, 0.15));
+    color: var(--mb-text);
+    font-family: UltimateTeam, sans-serif;
+    font-size: 1em;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.25s ease, background-color 0.25s ease, border-color 0.25s ease;
+  }
+  .btn-standard__label {
+    display: inline-flex;
+    align-items: center;
+  }
+  .btn-standard__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.2em;
+    height: 1.2em;
+    color: inherit;
+  }
+  .btn-standard__icon svg {
+    width: 100%;
+    height: 100%;
+  }
+  .btn-standard--compact {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.9em;
+  }
+  .btn-standard--spacious {
+    padding: 1.1rem 2.3rem;
+    font-size: 1.05em;
+  }
+  .btn-standard.is-hover,
+  .btn-standard:hover {
+    border-color: var(--mb-accent);
+    background: linear-gradient(135deg, rgba(78, 230, 235, 0.3), rgba(171, 146, 255, 0.3));
+    box-shadow: 0 12px 24px rgba(78, 230, 235, 0.25);
+    transform: translateY(-1px);
+  }
+  .btn-standard.is-active,
+  .btn-standard:active {
+    transform: translateY(0);
+    box-shadow: 0 6px 14px rgba(8, 12, 26, 0.35);
+    background: linear-gradient(135deg, rgba(78, 230, 235, 0.45), rgba(171, 146, 255, 0.4));
+  }
+  .btn-standard.is-focus,
+  .btn-standard:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--mb-accent-soft), 0 10px 22px rgba(78, 230, 235, 0.2);
+    border-color: var(--mb-accent);
+  }
+  .btn-standard:disabled {
+    background: var(--mb-disabled-bg);
+    border-color: transparent;
+    color: var(--mb-disabled-text);
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
   }
   .btn-test-notification
   {
@@ -75,33 +288,9 @@ export const cssOverride = () => {
     justify-content: center;
     align-items: center;
   }
-  input[type="number"]{
-    padding: 0 .5em;
-    border-radius: 0;
-    background-color: var(--mb-surface-elevated);
-    border: 1px solid var(--mb-accent);
-    box-sizing: border-box;
-    color: var(--mb-accent);
-    font-family: UltimateTeam,sans-serif;
-    font-size: 1em;
-    height: 2.8em;
-    opacity: 1;
-    width: 100%;
-    border-radius: 12px;
-    transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, color 0.3s ease;
-  }
-  input[type="number"]:focus {
-    background-color: var(--mb-surface);
-    color: var(--mb-text);
-    border-color: var(--mb-accent);
-    box-shadow: 0 0 0 3px var(--mb-accent-soft);
-  }
-  input[type="number"]:hover:not(:disabled) {
+  .field__input:hover:not(:disabled) {
     border-color: var(--mb-accent);
     box-shadow: 0 10px 20px rgba(8, 12, 26, 0.2);
-  }
-  input[type="number"]:disabled {
-    border-color: transparent;
   }
   .autoBuyerLog {
     font-size: ${!isPhone() ? "15px" : "13px"};
@@ -246,17 +435,19 @@ export const cssOverride = () => {
     color: var(--mb-text);
     border-radius: 14px;
     border: 1px solid var(--mb-accent);
-    transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease, color 0.3s ease;
   }
   .filter-sync-actions .btn-standard:hover,
-  .filter-actions .btn-standard:hover {
+  .filter-actions .btn-standard:hover,
+  .filter-sync-actions .btn-standard.is-hover,
+  .filter-actions .btn-standard.is-hover {
     background: var(--mb-accent);
     color: var(--mb-surface-deep);
     box-shadow: 0 12px 24px rgba(78, 230, 235, 0.3);
-    transform: translateY(-1px);
   }
   .filter-sync-actions .btn-standard:focus,
-  .filter-actions .btn-standard:focus {
+  .filter-actions .btn-standard:focus,
+  .filter-sync-actions .btn-standard.is-focus,
+  .filter-actions .btn-standard.is-focus {
     outline: none;
     box-shadow: 0 0 0 3px var(--mb-accent-soft);
   }
@@ -323,7 +514,7 @@ export const cssOverride = () => {
     height: 10px;
     width: 0%
   }
-  .numericInput:invalid {
+  .field__input:invalid {
     color: red;
     border: 1px solid;
   }

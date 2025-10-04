@@ -21,6 +21,12 @@ import { generateTextInput } from "../../../utils/uiUtils/generateTextInput";
 import { generateToggleInput } from "../../../utils/uiUtils/generateToggleInput";
 import { sendNotificationToUser } from "../../../utils/notificationUtil";
 import { isMarketAlertApp } from "../../../app.constants";
+import {
+  bellIcon,
+  keyIcon,
+  networkIcon,
+  userIcon,
+} from "../../../utils/uiUtils/icons";
 
 export const notificationSettingsView = function () {
   return `<div style='display : none' class='buyer-settings-wrapper notification-settings-view'> 
@@ -32,7 +38,11 @@ export const notificationSettingsView = function () {
          { idTelegramBotToken },
          "Token of your own bot",
          "CommonSettings",
-         "text"
+         "text",
+         undefined,
+         undefined,
+         null,
+         keyIcon
        )}
   ${generateTextInput(
     "Telegram Chat ID",
@@ -40,7 +50,11 @@ export const notificationSettingsView = function () {
     { idTelegramChatId },
     "Your Telegram ChatID",
     "CommonSettings",
-    "text"
+    "text",
+    undefined,
+    undefined,
+    null,
+    userIcon
   )}
   ${generateTextInput(
     "Discord Bot Token",
@@ -48,7 +62,11 @@ export const notificationSettingsView = function () {
     { idDiscordToken },
     "Your Discord Bot Token",
     "CommonSettings",
-    "text"
+    "text",
+    undefined,
+    undefined,
+    null,
+    keyIcon
   )}
   ${generateTextInput(
     "Discord Channel ID",
@@ -56,7 +74,11 @@ export const notificationSettingsView = function () {
     { idDiscordChannelId },
     "Your Discord Channel ID",
     "CommonSettings",
-    "text"
+    "text",
+    undefined,
+    undefined,
+    null,
+    networkIcon
   )}
   ${generateTextInput(
     "Discord WebHook Url",
@@ -64,7 +86,11 @@ export const notificationSettingsView = function () {
     { idWebHookUrl },
     "Your Discord Channel Webhook Url",
     "CommonSettings",
-    "text"
+    "text",
+    undefined,
+    undefined,
+    null,
+    networkIcon
   )}
   ${generateTextInput(
     "Fut Market Alert Notification Token",
@@ -72,7 +98,11 @@ export const notificationSettingsView = function () {
     { idFUTMarketAlertToken },
     "Your FUT Market Alert App's Token",
     "CommonSettings",
-    "text"
+    "text",
+    undefined,
+    undefined,
+    null,
+    bellIcon
   )}
   ${generateToggleInput(
     "Send Listing Notification",
@@ -88,8 +118,11 @@ export const notificationSettingsView = function () {
     { idNotificationType },
     "Type A for all notifications, B for buy or L for lost",
     "CommonSettings",
-    "text",
-    "[A|B|L]$"
+      "text",
+      "[A|B|L]$",
+      undefined,
+      null,
+      bellIcon
   )}
   ${generateToggleInput(
     "Send Notification",
@@ -133,7 +166,12 @@ export const notificationSettingsView = function () {
      idTestNotification,
      "Test Notification",
      () => sendNotificationToUser("Test Notification Message", true, true),
-     "call-to-action"
+      "call-to-action",
+      {
+        leadingIcon: bellIcon,
+        density: "spacious",
+        title: "Send a sample notification",
+      }
    )}
    </div>
   `;

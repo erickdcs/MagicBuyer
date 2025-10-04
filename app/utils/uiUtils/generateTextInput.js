@@ -18,7 +18,8 @@ export const generateTextInput = (
   type = "number",
   pattern = ".*",
   additionalClasses = "buyer-settings-field",
-  customCallBack = null
+  customCallBack = null,
+  icon = null
 ) => {
   const key = Object.keys(id)[0];
   if (placeholder) {
@@ -32,14 +33,32 @@ export const generateTextInput = (
     });
     eventMappers.add(key);
   }
-  return `<div class="price-filter ${additionalClasses}">
-       <div class="info">
-           <span class="secondary label">${label} :<br/><small>${info}</small></span>
-       </div>
-       <div class="buttonInfo">
-           <div class="inputBox">
-               <input pattern="${pattern}" type="${type}" class="numericInput" id='${id[key]}' placeholder=${placeholder}>
-           </div>
-       </div>
-    </div>`;
+  const helperMarkup =
+    info && info.trim() !== ""
+      ? `<div class="field__helper">${info}</div>`
+      : "";
+
+  const placeholderValue = placeholder ?? "";
+  const sanitizedValue =
+    placeholderValue !== "" && placeholderValue !== null
+      ? String(placeholderValue).replace(/"/g, "&quot;")
+      : null;
+  const valueAttribute = sanitizedValue !== null ? `value="${sanitizedValue}"` : "";
+
+  return `
+    <div class="field ${additionalClasses} ${icon ? "field--with-icon" : ""}">
+      <div class="field__control">
+        ${
+          icon
+            ? `<span class="field__icon" aria-hidden="true">${icon}</span>`
+            : ""
+        }
+        <div class="field__input-wrapper">
+          <input pattern="${pattern}" type="${type}" class="field__input" id='${id[key]}' placeholder=" " ${valueAttribute}>
+          <label class="field__label" for="${id[key]}">${label}</label>
+        </div>
+      </div>
+      ${helperMarkup}
+    </div>
+  `;
 };
